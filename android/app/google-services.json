@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "293844531550",
+    "project_id": "dietary-bfad4",
+    "storage_bucket": "dietary-bfad4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:293844531550:android:b728bee1654518b1d037cf",
+        "android_client_info": {
+          "package_name": "com.doror.dietary"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoWQXA3wh8DLSvRcr3KJN7BpsGJOI1qqs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
