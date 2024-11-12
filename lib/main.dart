@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import './firebase_init.dart'; // Firebase 초기화 관리 파일
+import 'login/login.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Flutter 바인딩 초기화
