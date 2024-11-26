@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My InterViewer ', // 앱 제목
+      title: 'Dietary ', // 앱 제목
       theme: ThemeData(
         primarySwatch: Colors.blue, // 앱 테마
       ),
