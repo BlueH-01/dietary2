@@ -4,6 +4,7 @@ import 'package:dietary2/firebase_init.dart';
 import 'package:dietary2/configure/palette.dart';
 import 'package:dietary2/main_home/main_home.dart';
 
+//황준선 작업 파일
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
