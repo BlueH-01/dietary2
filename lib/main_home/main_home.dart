@@ -285,16 +285,36 @@ class _MainScreenState extends State<MainScreen> {
             ),
             const SizedBox(height: 20),
             const Text("칼로리"),
-            LinearProgressIndicator(value: _calories / 3000),
+            LinearProgressIndicator(
+              value: _calories / 3000, // 진행 상태 값
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                  Color.fromARGB(255, 118, 193, 120)), // 초록색
+              backgroundColor: Colors.white, // 채워지지 않은 부분을 흰색으로 설정
+            ),
             Text("${_calories.toInt()} / 3000 kcal"),
             const Text("탄수화물"),
-            LinearProgressIndicator(value: _carbs / 500),
+            LinearProgressIndicator(
+              value: _carbs / 3000, // 진행 상태 값
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                  Color.fromARGB(255, 118, 193, 120)),
+              backgroundColor: Colors.white,
+            ),
             Text("${_carbs.toInt()} / 500 g"),
             const Text("단백질"),
-            LinearProgressIndicator(value: _proteins / 200),
+            LinearProgressIndicator(
+              value: _proteins / 200, // 진행 상태 값
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                  Color.fromARGB(255, 118, 193, 120)),
+              backgroundColor: Colors.white,
+            ),
             Text("${_proteins.toInt()} / 200 g"),
             const Text("지방"),
-            LinearProgressIndicator(value: _fats / 100),
+            LinearProgressIndicator(
+              value: _fats / 100, // 진행 상태 값
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                  Color.fromARGB(255, 118, 193, 120)),
+              backgroundColor: Colors.white,
+            ),
             Text("${_fats.toInt()} / 100 g"),
             const SizedBox(height: 20),
             _buildMealRow("아침"),
