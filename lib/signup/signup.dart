@@ -11,7 +11,7 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  final _authentication = FirebaseInit().auth; // Firebase Authentication 인스턴스
+  final _authentication = FirebaseInit().auth;
   final _formKey = GlobalKey<FormState>();
   String nickname = '';
   String email = '';
@@ -25,7 +25,7 @@ class _SignupScreenState extends State<SignupScreen> {
       if (password != confirmPassword) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Passwords do not match!'),
+            content: Text('비밀번호가 일치하지 않습니다!'),
             backgroundColor: Colors.red,
           ),
         );
@@ -33,7 +33,6 @@ class _SignupScreenState extends State<SignupScreen> {
       }
 
       try {
-        // Firebase Authentication으로 회원가입
         final userCredential =
             await _authentication.createUserWithEmailAndPassword(
           email: email,
@@ -43,21 +42,15 @@ class _SignupScreenState extends State<SignupScreen> {
         if (userCredential.user != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Signup successful!'),
+              content: Text('회원가입 성공!'),
               backgroundColor: Colors.green,
             ),
           );
 
-          // 추가 작업: Firebase에 닉네임 저장 (Firestore 또는 Realtime Database 사용 가능)
-          // 여기에서 Firebase Firestore로 추가 정보 저장 로직 구현 가능
-          print("User ID: ${userCredential.user!.uid}");
-          print("Nickname: $nickname");
           String userId = userCredential.user!.uid;
-          // 성공 시 다른 화면으로 이동
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) {
-              print(userId);
               return UserInfoScreen(
                 userId: userId,
               );
@@ -65,12 +58,11 @@ class _SignupScreenState extends State<SignupScreen> {
           );
         }
       } catch (error) {
-        // 에러 처리
-        String errorMessage = 'An error occurred. Please try again.';
+        String errorMessage = '오류가 발생했습니다. 다시 시도해주세요.';
         if (error.toString().contains('email-already-in-use')) {
-          errorMessage = 'This email is already in use.';
+          errorMessage = '이미 사용 중인 이메일입니다.';
         } else if (error.toString().contains('weak-password')) {
-          errorMessage = 'The password is too weak.';
+          errorMessage = '비밀번호가 너무 약합니다.';
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -87,8 +79,8 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sign Up'),
-        backgroundColor: Colors.blue,
+        title: const Text('회원가입'),
+        backgroundColor: const Color.fromARGB(255, 213, 232, 210),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -99,22 +91,27 @@ class _SignupScreenState extends State<SignupScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Create an Account',
+                  '계정을 생성하세요',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
+                    color: Colors.green,
                   ),
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Nickname',
-                    prefixIcon: Icon(Icons.person),
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: '닉네임',
+                    prefixIcon: const Icon(Icons.person, color: Colors.green),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    filled: true,
+                    fillColor: const Color.fromARGB(255, 213, 232, 210),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter a nickname';
+                      return '닉네임을 입력해주세요';
                     }
                     return null;
                   },
@@ -124,15 +121,19 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: Icon(Icons.email),
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: '이메일',
+                    prefixIcon: const Icon(Icons.email, color: Colors.green),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    filled: true,
+                    fillColor: const Color.fromARGB(255, 213, 232, 210),
                   ),
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || !value.contains('@')) {
-                      return 'Please enter a valid email address';
+                      return '유효한 이메일을 입력해주세요';
                     }
                     return null;
                   },
@@ -142,15 +143,19 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: Icon(Icons.lock),
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: '비밀번호',
+                    prefixIcon: const Icon(Icons.lock, color: Colors.green),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    filled: true,
+                    fillColor: const Color.fromARGB(255, 213, 232, 210),
                   ),
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.length < 6) {
-                      return 'Password must be at least 6 characters';
+                      return '비밀번호는 6자 이상이어야 합니다';
                     }
                     return null;
                   },
@@ -160,15 +165,20 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Confirm Password',
-                    prefixIcon: Icon(Icons.lock_outline),
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: '비밀번호 확인',
+                    prefixIcon:
+                        const Icon(Icons.lock_outline, color: Colors.green),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    filled: true,
+                    fillColor: const Color.fromARGB(255, 213, 232, 210),
                   ),
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please confirm your password';
+                      return '비밀번호를 다시 입력해주세요';
                     }
                     return null;
                   },
@@ -181,6 +191,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: ElevatedButton(
                     onPressed: _trySignup,
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 50, vertical: 15),
                       shape: RoundedRectangleBorder(
@@ -188,8 +199,8 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ),
                     child: const Text(
-                      'Sign Up',
-                      style: TextStyle(fontSize: 18),
+                      '회원가입',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
                 ),

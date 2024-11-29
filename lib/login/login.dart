@@ -4,7 +4,6 @@ import 'package:dietary2/firebase_init.dart';
 import 'package:dietary2/configure/palette.dart';
 import 'package:dietary2/main_home/main_home.dart';
 
-//황준선 작업 파일
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -43,11 +42,11 @@ class _LoginScreenState extends State<LoginScreen> {
               right: 0,
               left: 0,
               child: Container(
-                height: 300,
+                height: MediaQuery.of(context).size.height,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('images/ring.jpg'),
-                    fit: BoxFit.fill,
+                    image: AssetImage('images/diet.jpg'),
+                    fit: BoxFit.cover,
                   ),
                 ),
                 child: Container(
@@ -56,38 +55,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       RichText(
-                        text: TextSpan(
-                          text: 'Welcome ',
-                          style: const TextStyle(
+                        text: const TextSpan(
+                          text: 'Dietary ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
                             letterSpacing: 1.0,
-                            fontSize: 25,
+                            fontSize: 38,
                             color: Colors.white,
                           ),
-                          children: [
-                            TextSpan(
-                              text: 'Dietary',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.0,
-                                fontSize: 25,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
                         ),
                       ),
                       const SizedBox(
                         height: 5,
                       ),
-                      Text(
-                        isSignupScreen
-                            ? 'Sign up to continue!'
-                            : 'Signin to continue',
-                        style: const TextStyle(
-                          letterSpacing: 1.0,
-                          color: Colors.white,
-                        ),
-                      )
                     ],
                   ),
                 ),
@@ -97,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
             AnimatedPositioned(
               duration: const Duration(milliseconds: 500),
               curve: Curves.easeIn,
-              top: 180,
+              top: 400, //로그인 박스 위치
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 500),
                 curve: Curves.easeIn,
@@ -131,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Column(
                               children: [
                                 Text(
-                                  'LOGIN',
+                                  '로그인',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -168,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 },
                                 decoration: const InputDecoration(
                                   prefixIcon: Icon(
-                                    Icons.account_circle,
+                                    Icons.email,
                                     color: Palette.iconColor,
                                   ),
                                   enabledBorder: OutlineInputBorder(
@@ -261,7 +241,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) {
-                        return SignupScreen();
+                        return const SignupScreen();
                       }),
                     );
                   });
@@ -270,7 +250,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   decoration: BoxDecoration(
-                    color: Palette.activeColor,
+                    color: const Color.fromARGB(255, 213, 232, 210),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -280,8 +260,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
                   ),
-                  child: Row(
-                    children: const [
+                  child: const Row(
+                    children: [
                       Text(
                         "회원가입",
                         style: TextStyle(
@@ -304,14 +284,14 @@ class _LoginScreenState extends State<LoginScreen> {
             AnimatedPositioned(
               duration: const Duration(milliseconds: 500),
               curve: Curves.easeIn,
-              top: 380.0,
+              top: 580.0, //화살표 동그라미 위치
               right: 0,
               left: 0,
               child: Center(
                 child: Container(
                   padding: const EdgeInsets.all(15),
-                  height: 90,
-                  width: 90,
+                  height: 80, //화살표 동그라미 크기
+                  width: 80,
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(50)),
@@ -326,7 +306,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) {
-                                return MainScreen();
+                                return const MainScreen();
                               }),
                             );
                           }
@@ -352,7 +332,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) {
-                              return MainScreen();
+                              return const MainScreen();
                             }),
                           );
                         }
@@ -371,8 +351,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: BoxDecoration(
                           gradient: const LinearGradient(
                               colors: [
-                                Colors.blue,
-                                Colors.red,
+                                Color.fromARGB(
+                                    255, 213, 232, 210), //화살표 동그라미 색상
+                                Color.fromARGB(255, 213, 232, 210),
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight),
@@ -382,7 +363,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.black.withOpacity(0.3),
                               spreadRadius: 1,
                               blurRadius: 1,
-                              offset: Offset(0, 1),
+                              offset: const Offset(0, 1),
                             ),
                           ]),
                       child: const Icon(
