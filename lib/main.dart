@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
           buttonColor: Color.fromARGB(255, 213, 232, 210), // 버튼 색상
         ),
         scaffoldBackgroundColor:
-            const Color.fromARGB(255, 255, 255, 255), // 기본 배경 색상 흰색
+            const Color.fromARGB(255, 255, 255, 255), // 기본 배경 색상
         textButtonTheme: TextButtonThemeData(
           style: TextButton.styleFrom(
               foregroundColor:
