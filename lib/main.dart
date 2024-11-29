@@ -16,9 +16,68 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Dietary ', // 앱 제목
+      title: 'Dietary', // 앱 제목
       theme: ThemeData(
-        primarySwatch: Colors.blue, // 앱 테마
+        primaryColor:
+            const Color.fromARGB(255, 213, 232, 210), // 체크박스나 스위치 활성화 색상
+        buttonTheme: const ButtonThemeData(
+          buttonColor: Color.fromARGB(255, 213, 232, 210), // 버튼 색상
+        ),
+        scaffoldBackgroundColor:
+            const Color.fromARGB(255, 255, 255, 255), // 기본 배경 색상 흰색
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+              foregroundColor:
+                  const Color.fromARGB(255, 213, 232, 210)), // 텍스트 버튼 색상
+        ),
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.green)
+            .copyWith(secondary: const Color.fromARGB(255, 213, 232, 210)),
+        checkboxTheme: CheckboxThemeData(
+          fillColor: WidgetStateProperty.resolveWith<Color?>(
+              (Set<WidgetState> states) {
+            if (states.contains(WidgetState.disabled)) {
+              return null;
+            }
+            if (states.contains(WidgetState.selected)) {
+              return const Color.fromARGB(255, 213, 232, 210);
+            }
+            return null;
+          }),
+        ),
+        radioTheme: RadioThemeData(
+          fillColor: WidgetStateProperty.resolveWith<Color?>(
+              (Set<WidgetState> states) {
+            if (states.contains(WidgetState.disabled)) {
+              return null;
+            }
+            if (states.contains(WidgetState.selected)) {
+              return const Color.fromARGB(255, 213, 232, 210);
+            }
+            return null;
+          }),
+        ),
+        switchTheme: SwitchThemeData(
+          thumbColor: WidgetStateProperty.resolveWith<Color?>(
+              (Set<WidgetState> states) {
+            if (states.contains(WidgetState.disabled)) {
+              return null;
+            }
+            if (states.contains(WidgetState.selected)) {
+              return const Color.fromARGB(255, 213, 232, 210);
+            }
+            return null;
+          }),
+          trackColor: WidgetStateProperty.resolveWith<Color?>(
+              (Set<WidgetState> states) {
+            if (states.contains(WidgetState.disabled)) {
+              return null;
+            }
+            if (states.contains(WidgetState.selected)) {
+              return const Color.fromARGB(255, 213, 232, 210);
+            }
+            return null;
+          }),
+        ),
       ),
       home: const LoginScreen(), // 시작 화면
     );

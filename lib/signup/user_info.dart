@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:dietary2/firebase_init.dart';
-import '../main_home/main_home.dart';
 
 class UserInfoScreen extends StatefulWidget {
   final String userId;
@@ -28,7 +28,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('회원 정보 입력'),
-        backgroundColor: const Color.fromARGB(255, 91, 110, 91), // 수정된 색상
+        backgroundColor: Colors.blue,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -40,24 +40,15 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
               children: [
                 const Text(
                   '회원 정보를 입력해주세요.',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 91, 110, 91), // 텍스트 색상 수정
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
                 // 나이 입력 필드
                 TextFormField(
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: '나이',
-                    filled: true,
-                    fillColor:
-                        const Color.fromARGB(255, 213, 232, 210), // 수정된 색상
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                    border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -75,14 +66,9 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                 const SizedBox(height: 20),
                 // 성별 선택 드롭다운
                 DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: '성별',
-                    filled: true,
-                    fillColor:
-                        const Color.fromARGB(255, 213, 232, 210), // 수정된 색상
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                    border: OutlineInputBorder(),
                   ),
                   value: userGender,
                   items: genders.map((String gender) {
@@ -101,14 +87,9 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                 // 키 입력 필드
                 TextFormField(
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: '키 (cm)',
-                    filled: true,
-                    fillColor:
-                        const Color.fromARGB(255, 213, 232, 210), // 수정된 색상
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                    border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -128,14 +109,9 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                 // 현재 체중 입력 필드
                 TextFormField(
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: '현재 체중 (kg)',
-                    filled: true,
-                    fillColor:
-                        const Color.fromARGB(255, 213, 232, 210), // 수정된 색상
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                    border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -155,14 +131,9 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                 // 목표 체중 입력 필드
                 TextFormField(
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: '목표 체중 (kg)',
-                    filled: true,
-                    fillColor:
-                        const Color.fromARGB(255, 213, 232, 210), // 수정된 색상
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+                    border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -200,40 +171,26 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                           });
 
                           print('Firestore 저장 성공');
+                          print('나이: $userAge');
+                          print('성별: $userGender');
+                          print('키: $userHeight cm');
+                          print('현재 체중: $currentWeight kg');
+                          print('목표 체중: $targetWeight kg');
+
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('회원 정보가 Firestore에 저장되었습니다!'),
-                            ),
-                          );
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) {
-                              return const MainScreen();
-                            }),
+                                content: Text('회원 정보가 Firestore에 저장되었습니다!')),
                           );
                         } catch (e) {
                           print('Firestore 저장 실패: $e');
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('회원 정보 저장에 실패했습니다. 다시 시도해주세요.'),
-                            ),
+                                content: Text('회원 정보 저장에 실패했습니다. 다시 시도해주세요.')),
                           );
                         }
                       }
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          const Color.fromARGB(255, 91, 110, 91), // 버튼 색상
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 50, vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    child: const Text(
-                      '저장',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
-                    ),
+                    child: const Text('저장'),
                   ),
                 ),
               ],

@@ -29,11 +29,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+
     return Scaffold(
       backgroundColor: Palette.backgroundColor,
       body: GestureDetector(
         onTap: () {
-          FocusScope.of(context).unfocus();
+          FocusScope.of(context).unfocus(); // 화면 터치 시 키보드 숨기기
         },
         child: Stack(
           children: [
@@ -77,7 +79,9 @@ class _LoginScreenState extends State<LoginScreen> {
             AnimatedPositioned(
               duration: const Duration(milliseconds: 500),
               curve: Curves.easeIn,
-              top: 400, //로그인 박스 위치
+              top: keyboardHeight > 0
+                  ? 500 - keyboardHeight
+                  : 400, // 키보드 높이에 따라 이동
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 500),
                 curve: Curves.easeIn,
@@ -135,7 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 key: const Key('login_email'),
                                 validator: (value) {
                                   if (value!.isEmpty || !value.contains('@')) {
-                                    return 'Please enter a valid email address';
+                                    return '유효한 이메일 주소를 입력하세요';
                                   } else {
                                     return null;
                                   }
@@ -167,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       Radius.circular(35.0),
                                     ),
                                   ),
-                                  hintText: 'Email',
+                                  hintText: '이메일',
                                   hintStyle: TextStyle(
                                     fontSize: 14,
                                     color: Palette.textColor1,
@@ -181,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 key: const Key('login_password'),
                                 validator: (value) {
                                   if (value!.isEmpty || value.length < 6) {
-                                    return 'Please enter at least 7 characters long';
+                                    return '7글자 이상 입력하세요';
                                   } else {
                                     return null;
                                   }
@@ -213,7 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       Radius.circular(35.0),
                                     ),
                                   ),
-                                  hintText: 'Password',
+                                  hintText: '비밀번호',
                                   hintStyle: TextStyle(
                                     fontSize: 14,
                                     color: Palette.textColor1,
@@ -284,7 +288,9 @@ class _LoginScreenState extends State<LoginScreen> {
             AnimatedPositioned(
               duration: const Duration(milliseconds: 500),
               curve: Curves.easeIn,
-              top: 580.0, //화살표 동그라미 위치
+              top: keyboardHeight > 0
+                  ? keyboardHeight + 50 // 키보드 높이에 따라 화살표 위치 조정
+                  : 600.0, // 기본 위치
               right: 0,
               left: 0,
               child: Center(
@@ -310,16 +316,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               }),
                             );
                           }
-                        } catch (e) {
-                          print(e);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content:
-                                  Text('Please check your email and password'),
-                              backgroundColor: Colors.blue,
-                            ),
-                          );
-                        }
+                        } catch (e) {}
                       }
                       _tryValidation();
 
@@ -340,9 +337,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         print(e);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content:
-                                Text('Please check your email and password'),
-                            backgroundColor: Colors.blue,
+                            content: Text('이메일과 비밀번호를 확인하세요'),
+                            backgroundColor: Color.fromARGB(255, 195, 73, 52),
                           ),
                         );
                       }

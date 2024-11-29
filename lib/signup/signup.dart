@@ -43,7 +43,7 @@ class _SignupScreenState extends State<SignupScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('회원가입 성공!'),
-              backgroundColor: Colors.green,
+              backgroundColor: Color.fromARGB(255, 103, 180, 105),
             ),
           );
 
@@ -79,7 +79,16 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('회원가입'),
+        title: Container(
+          padding: const EdgeInsets.only(left: 65), // 왼쪽 여백을 추가하여 우측으로 미세 이동
+          child: const Text(
+            '회원가입',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
         backgroundColor: const Color.fromARGB(255, 213, 232, 210),
       ),
       body: SingleChildScrollView(
@@ -95,23 +104,41 @@ class _SignupScreenState extends State<SignupScreen> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green,
+                    color: Color.fromARGB(255, 118, 183, 120),
                   ),
                 ),
                 const SizedBox(height: 20),
+
+                // 이름 입력 필드
                 TextFormField(
                   decoration: InputDecoration(
-                    labelText: '닉네임',
-                    prefixIcon: const Icon(Icons.person, color: Colors.green),
+                    labelText: '이름',
+                    labelStyle: const TextStyle(
+                        color: Color.fromARGB(255, 105, 172, 107)),
+                    prefixIcon: const Icon(Icons.person,
+                        color: Color.fromARGB(255, 104, 182, 106)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: Colors.white),
                     ),
                     filled: true,
                     fillColor: const Color.fromARGB(255, 213, 232, 210),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(
+                          color: Color.fromARGB(255, 104, 182, 106)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: Colors.white),
+                    ),
                   ),
+                  style: const TextStyle(
+                      color: Color.fromARGB(255, 104, 182, 106)), // 글자 색상 변경
+
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return '닉네임을 입력해주세요';
+                      return '이름을 입력해주세요';
                     }
                     return null;
                   },
@@ -120,16 +147,33 @@ class _SignupScreenState extends State<SignupScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
+
+                // 이메일 입력 필드
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: '이메일',
-                    prefixIcon: const Icon(Icons.email, color: Colors.green),
+                    labelStyle: const TextStyle(
+                        color: Color.fromARGB(255, 105, 172, 107)),
+                    prefixIcon: const Icon(Icons.email,
+                        color: Color.fromARGB(255, 104, 182, 106)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: Colors.white),
                     ),
                     filled: true,
                     fillColor: const Color.fromARGB(255, 213, 232, 210),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(
+                          color: Color.fromARGB(255, 104, 182, 106)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: Colors.white),
+                    ),
                   ),
+                  style: const TextStyle(color: Colors.white), // 글자 색상 변경
+
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || !value.contains('@')) {
@@ -142,16 +186,33 @@ class _SignupScreenState extends State<SignupScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
+
+                // 비밀번호 입력 필드
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: '비밀번호',
-                    prefixIcon: const Icon(Icons.lock, color: Colors.green),
+                    labelStyle: const TextStyle(
+                        color: Color.fromARGB(255, 105, 172, 107)),
+                    prefixIcon: const Icon(Icons.lock,
+                        color: Color.fromARGB(255, 104, 182, 106)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: Colors.white),
                     ),
                     filled: true,
                     fillColor: const Color.fromARGB(255, 213, 232, 210),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(
+                          color: Color.fromARGB(255, 104, 182, 106)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: Colors.white),
+                    ),
                   ),
+                  style: const TextStyle(color: Colors.white), // 글자 색상 변경
+
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.length < 6) {
@@ -164,17 +225,32 @@ class _SignupScreenState extends State<SignupScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
+
+                // 비밀번호 확인 입력 필드
                 TextFormField(
                   decoration: InputDecoration(
                     labelText: '비밀번호 확인',
-                    prefixIcon:
-                        const Icon(Icons.lock_outline, color: Colors.green),
+                    labelStyle: const TextStyle(
+                        color: Color.fromARGB(255, 105, 172, 107)),
+                    prefixIcon: const Icon(Icons.lock_open,
+                        color: Color.fromARGB(255, 104, 182, 106)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: Colors.white),
                     ),
                     filled: true,
                     fillColor: const Color.fromARGB(255, 213, 232, 210),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(
+                          color: Color.fromARGB(255, 104, 182, 106)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: const BorderSide(color: Colors.white),
+                    ),
                   ),
+                  style: const TextStyle(color: Colors.white), // 글자 색상 변경
                   obscureText: true,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -191,7 +267,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: ElevatedButton(
                     onPressed: _trySignup,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      backgroundColor: const Color.fromARGB(255, 118, 193, 120),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 50, vertical: 15),
                       shape: RoundedRectangleBorder(
