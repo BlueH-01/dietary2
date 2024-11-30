@@ -1,6 +1,8 @@
+import 'package:dietary2/settings/myPage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../food_register/food_regi.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../settings/notify.dart';
 //import 'package:dietary2/foodlist/food_list.dart'; // DietaryScreen 파일 import
 
@@ -249,11 +251,11 @@ class _MainScreenState extends State<MainScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const NotificationService(),
+                  builder: (context) => const UserProfileScreen(),
                 ),
               );
             },
-            icon: const Icon(Icons.notifications),
+            icon: const Icon(Icons.settings, size: 30),
           ),
         ],
       ),
@@ -325,5 +327,30 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
     );
+  }
+}
+
+class UserDataService {
+  final FirebaseFirestore firestore;
+
+  UserDataService(this.firestore);
+
+  Future<Map<String, dynamic>?> fetchUserData(String userId) async {
+    try {
+      // Firestore에서 사용자 데이터 가져오기
+      DocumentSnapshot userDoc =
+          await firestore.collection('users').doc(userId).get();
+
+      if (userDoc.exists) {
+        // 문서가 존재하면 데이터를 반환
+        return userDoc.data() as Map<String, dynamic>;
+      } else {
+        print('User data not found!');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+      return null;
+    }
   }
 }

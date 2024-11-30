@@ -16,6 +16,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
   FirebaseFirestore firestore = FirebaseInit().firestore;
 
   // 사용자 정보 변수
+  String userName = "";
   int userAge = 0;
   String userGender = '여성'; // 기본값
   double userHeight = 0.0;
@@ -41,6 +42,23 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                 const Text(
                   '회원 정보를 입력해주세요.',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 20),
+                // 이름 입력 필드
+                TextFormField(
+                  keyboardType: TextInputType.name,
+                  decoration: const InputDecoration(
+                    labelText: '이름',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '이름을 입력해주세요.';
+                    }
+                  },
+                  onSaved: (value) {
+                    userName = value!;
+                  },
                 ),
                 const SizedBox(height: 20),
                 // 나이 입력 필드
@@ -163,6 +181,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                               .collection(widget.userId) // `users` 컬렉션 선택
                               .doc('userInfo') // userId로 문서 선택
                               .set({
+                            'name': userName,
                             'age': userAge,
                             'gender': userGender,
                             'height': userHeight,
@@ -171,6 +190,7 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                           });
 
                           print('Firestore 저장 성공');
+                          print('이름: $userName');
                           print('나이: $userAge');
                           print('성별: $userGender');
                           print('키: $userHeight cm');
