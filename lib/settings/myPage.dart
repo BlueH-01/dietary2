@@ -29,19 +29,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Future<void> loadUserData() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-<<<<<<< HEAD
-      String userId = user.uid;
-
-      DocumentSnapshot doc = await FirebaseFirestore.instance
-          .collection(userId)
-          .doc('userInfo')
-=======
       final String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
 
       DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
->>>>>>> f3c9626 (조민기)
           .get();
 
       if (doc.exists) {
@@ -67,25 +59,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-<<<<<<< HEAD
-        title: const Text('My Profile',
-            style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white)),
-        backgroundColor: const Color.fromARGB(255, 132, 195, 135),
-        elevation: 5,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Notification icon
-              Align(
-                alignment: Alignment.topRight,
-                child: IconButton(
-=======
         title: Text('My page'),
       ),
       body: Padding(
@@ -97,7 +70,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
->>>>>>> f3c9626 (조민기)
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -109,55 +81,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   icon: const Icon(
                     Icons.notifications,
                     size: 40,
-<<<<<<< HEAD
-                    color: Color.fromARGB(255, 132, 195, 135),
-                  ),
-                ),
-              ),
-              // Profile image
-              Center(
-                child: CircleAvatar(
-                  radius: 75,
-                  backgroundImage: AssetImage('images/profile.png'),
-                ),
-              ),
-              SizedBox(height: 10),
-              Text(
-                userName ?? 'Loading...',
-                style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 132, 195, 135)),
-              ),
-              SizedBox(height: 30),
-              // User details section
-              Card(
-                elevation: 5,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    children: [
-                      _buildInfoRow('나이', '${userAge ?? 'Loading...'}'),
-                      SizedBox(height: 10),
-                      _buildInfoRow('성별', '${userGender ?? 'Loading...'}'),
-                      SizedBox(height: 10),
-                      _buildInfoRow('키', '${userHeight ?? 'Loading...'}'),
-                      SizedBox(height: 10),
-                      _buildInfoRow(
-                          '현재 몸무게', '${currentWeight ?? 'Loading...'} kg'),
-                      SizedBox(height: 10),
-                      _buildInfoRow(
-                          '목표 몸무게', '${targetWeight ?? 'Loading...'} kg'),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-=======
                   ),
                 ),
               ],
@@ -187,7 +110,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             SizedBox(height: 16),
             _buildInfoRow('목표 몸무게', '${targetWeight} kg'),
           ],
->>>>>>> f3c9626 (조민기)
         ),
       ),
     );
@@ -199,29 +121,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       children: [
         Text(
           label,
-<<<<<<< HEAD
-          style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Color.fromARGB(255, 132, 195, 135)),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-              fontSize: 18, fontWeight: FontWeight.w400, color: Colors.black87),
-=======
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         Text(
           value,
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
->>>>>>> f3c9626 (조민기)
         ),
       ],
     );
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> f3c9626 (조민기)
