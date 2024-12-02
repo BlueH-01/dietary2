@@ -29,11 +29,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Future<void> loadUserData() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
+<<<<<<< HEAD
       String userId = user.uid;
 
       DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection(userId)
           .doc('userInfo')
+=======
+      final String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+
+      DocumentSnapshot doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+>>>>>>> f3c9626 (조민기)
           .get();
 
       if (doc.exists) {
@@ -59,6 +67,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+<<<<<<< HEAD
         title: const Text('My Profile',
             style: TextStyle(
                 fontSize: 24,
@@ -76,6 +85,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Align(
                 alignment: Alignment.topRight,
                 child: IconButton(
+=======
+        title: Text('My page'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+>>>>>>> f3c9626 (조민기)
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -87,6 +109,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   icon: const Icon(
                     Icons.notifications,
                     size: 40,
+<<<<<<< HEAD
                     color: Color.fromARGB(255, 132, 195, 135),
                   ),
                 ),
@@ -134,6 +157,37 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               ),
             ],
           ),
+=======
+                  ),
+                ),
+              ],
+            ),
+            Center(
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 30),
+            Align(
+              alignment: Alignment.center,
+              child: Text(
+                '$userName',
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(height: 65),
+            _buildInfoRow('나이', '${userAge}'),
+            SizedBox(height: 16),
+            _buildInfoRow('성별', '${userGender}'),
+            SizedBox(height: 16),
+            _buildInfoRow('키', '${userHeight}'),
+            SizedBox(height: 16),
+            _buildInfoRow('현재 몸무게', '${currentWeight} kg'),
+            SizedBox(height: 16),
+            _buildInfoRow('목표 몸무게', '${targetWeight} kg'),
+          ],
+>>>>>>> f3c9626 (조민기)
         ),
       ),
     );
@@ -145,6 +199,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       children: [
         Text(
           label,
+<<<<<<< HEAD
           style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -154,8 +209,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           value,
           style: TextStyle(
               fontSize: 18, fontWeight: FontWeight.w400, color: Colors.black87),
+=======
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+        Text(
+          value,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+>>>>>>> f3c9626 (조민기)
         ),
       ],
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> f3c9626 (조민기)

@@ -178,8 +178,8 @@ class _UserInfoScreenState extends State<UserInfoScreen> {
                         // Firestore에 사용자 정보 저장
                         try {
                           await firestore
-                              .collection(widget.userId) // `users` 컬렉션 선택
-                              .doc('userInfo') // userId로 문서 선택
+                              .collection('users') // `users` 컬렉션 고정
+                              .doc(widget.userId) // userId로 문서 선택
                               .set({
                             'name': userName,
                             'age': userAge,
