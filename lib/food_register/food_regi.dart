@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-//성현 작업파일
+
 class DietaryScreen extends StatefulWidget {
   const DietaryScreen({super.key});
 
@@ -51,85 +51,95 @@ class _DietaryScreenState extends State<DietaryScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Center(
-            child: Text(
-              '음식 등록',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-          ),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          contentPadding: const EdgeInsets.all(20),
           content: SingleChildScrollView(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextField(
-                  controller: nameController,
-                  decoration: const InputDecoration(labelText: '음식이름'),
+                const Center(
+                  child: Text(
+                    '음식 등록',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
                 ),
-                TextField(
-                  controller: caloriesController,
-                  decoration: const InputDecoration(labelText: '칼로리(kcal)'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: carbsController,
-                  decoration: const InputDecoration(labelText: '탄수화물 (g)'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: proteinController,
-                  decoration: const InputDecoration(labelText: '단백질 (g)'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: fatController,
-                  decoration: const InputDecoration(labelText: '지방 (g)'),
-                  keyboardType: TextInputType.number,
+                const SizedBox(height: 20),
+                _buildInputField('음식 이름', nameController),
+                _buildInputField('칼로리(kcal)', caloriesController,
+                    isNumeric: true),
+                _buildInputField('탄수화물 (g)', carbsController, isNumeric: true),
+                _buildInputField('단백질 (g)', proteinController, isNumeric: true),
+                _buildInputField('지방 (g)', fatController, isNumeric: true),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('취소'),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        if (nameController.text.isEmpty ||
+                            caloriesController.text.isEmpty ||
+                            carbsController.text.isEmpty ||
+                            proteinController.text.isEmpty ||
+                            fatController.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('모든 필드를 입력하세요')),
+                          );
+                          return;
+                        }
+
+                        try {
+                          final newFood = {
+                            'name': nameController.text,
+                            'calories': int.parse(caloriesController.text),
+                            'carbs': double.parse(carbsController.text),
+                            'protein': double.parse(proteinController.text),
+                            'fat': double.parse(fatController.text),
+                            'favorite': false,
+                          };
+                          _addFood(newFood);
+                          Navigator.pop(context);
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('숫자를 입력하세요')),
+                          );
+                        }
+                      },
+                      child: const Text('등록'),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('취소'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (nameController.text.isEmpty ||
-                    caloriesController.text.isEmpty ||
-                    carbsController.text.isEmpty ||
-                    proteinController.text.isEmpty ||
-                    fatController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('모든 필드를 입력하세요')),
-                  );
-                  return;
-                }
-
-                try {
-                  final newFood = {
-                    'name': nameController.text,
-                    'calories': int.parse(caloriesController.text),
-                    'carbs': double.parse(carbsController.text),
-                    'protein': double.parse(proteinController.text),
-                    'fat': double.parse(fatController.text),
-                    'favorite': false,
-                  };
-                  _addFood(newFood);
-                  Navigator.pop(context);
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('숫자를 입력하세요')),
-                  );
-                }
-              },
-              child: const Text('등록'),
-            ),
-          ],
         );
       },
+    );
+  }
+
+  Widget _buildInputField(String label, TextEditingController controller,
+      {bool isNumeric = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+          filled: true,
+          fillColor: const Color(0xFFF4F4F4),
+        ),
+        keyboardType: isNumeric ? TextInputType.number : TextInputType.text,
+      ),
     );
   }
 
@@ -137,13 +147,9 @@ class _DietaryScreenState extends State<DietaryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 100,
         title: const Text(
-          '식단 기록',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 28,
-          ),
+          '음식 등록',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         bottom: PreferredSize(
@@ -211,22 +217,58 @@ class _DietaryScreenState extends State<DietaryScreen> {
               return ListTile(
                 title: Text(food['name']),
                 subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start, // 텍스트 정렬
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       '칼로리: ${food['calories']}kcal, 탄수화물: ${food['carbs']}g',
-                      style: const TextStyle(fontSize: 12), // 첫 번째 줄 스타일
+                      style: const TextStyle(fontSize: 12),
                     ),
                     Text(
                       '단백질: ${food['protein']}g, 지방: ${food['fat']}g',
-                      style: const TextStyle(fontSize: 12), // 두 번째 줄 스타일
+                      style: const TextStyle(fontSize: 12),
                     ),
                   ],
                 ),
-                trailing: Checkbox(
-                  value: food['favorite'],
-                  onChanged: (_) => _toggleFavorite(doc),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        food['favorite'] ? Icons.star : Icons.star_border,
+                        color: food['favorite'] ? Colors.yellow : Colors.grey,
+                      ),
+                      onPressed: () => _toggleFavorite(doc),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete,
+                          color: Color.fromARGB(255, 213, 232, 210)),
+                      onPressed: () async {
+                        try {
+                          await _firestore
+                              .collection('foods')
+                              .doc(doc.id)
+                              .delete();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('음식이 삭제되었습니다.')),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('삭제 실패: $e')),
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
+                onTap: () {
+                  Navigator.pop(context, {
+                    'name': food['name'],
+                    'calories': food['calories'],
+                    'carbs': food['carbs'],
+                    'protein': food['protein'],
+                    'fat': food['fat'],
+                  });
+                },
               );
             },
           );
