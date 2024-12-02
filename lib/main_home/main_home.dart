@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../food_register/food_regi.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../settings/notify.dart';
+
 //import 'package:dietary2/foodlist/food_list.dart'; // DietaryScreen 파일 import
 
 class MainScreen extends StatefulWidget {
@@ -164,30 +165,30 @@ class _MainScreenState extends State<MainScreen> {
     final meal = _mealData[mealTime]!;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Text(
-                "$mealTime: ${meal['name']} (${meal['calories']} kcal)",
-                style: const TextStyle(fontSize: 16),
-              ),
-            ),
+      child: Card(
+        elevation: 4.0, // 그림자 효과
+
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: ListTile(
+          contentPadding: const EdgeInsets.all(16.0),
+          title: Text(
+            "$mealTime: ${meal['name']}",
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(width: 8),
-          IconButton(
+          subtitle: Text(
+            "${meal['calories']} kcal",
+            style: const TextStyle(fontSize: 12),
+          ),
+          trailing: IconButton(
             onPressed: () {
               _openFoodSelectionScreen(mealTime);
             },
-            icon: const Icon(Icons.edit, color: Colors.grey),
+            icon: const Icon(Icons.edit,
+                color: Color.fromARGB(255, 132, 195, 135)),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -240,14 +241,20 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Main Screen"),
+        title: const Text(
+          "식단 기록",
+          style: TextStyle(
+              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        centerTitle: true,
+        backgroundColor: const Color.fromARGB(255, 132, 195, 135), // 앱바 색상
         actions: [
           IconButton(
             onPressed: () {
-              // 알림 버튼 클릭 시 동작
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -255,75 +262,92 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               );
             },
-            icon: const Icon(Icons.settings, size: 30),
+            icon: const Icon(Icons.settings, size: 30, color: Colors.white),
           ),
         ],
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ), // 앱바 하단 모서리 둥글게 처리
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: () => _changeDate(-1),
-                  icon: const Icon(Icons.arrow_left),
+      body: SingleChildScrollView(
+        // Add scroll functionality
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () => _changeDate(-1),
+                    icon: const Icon(Icons.arrow_left),
+                  ),
+                  Text(
+                    "${_selectedDate.toLocal()}".split(' ')[0],
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  IconButton(
+                    onPressed: () => _changeDate(1),
+                    icon: const Icon(Icons.arrow_right),
+                  ),
+                  IconButton(
+                    onPressed: () => _selectDate(context),
+                    icon: const Icon(Icons.calendar_today),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              const Text("칼로리"),
+              LinearProgressIndicator(
+                value: _calories / 2500, // 진행 상태 값
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                  Color.fromARGB(255, 118, 193, 120), // 초록색
                 ),
-                Text(
-                  "${_selectedDate.toLocal()}".split(' ')[0],
-                  style: const TextStyle(fontSize: 20),
+                backgroundColor: Colors.grey[300], // 채워지지 않은 부분 색상
+                minHeight: 8.0, // 높이 조정
+              ),
+              Text("${_calories.toInt()} / 2500 kcal"),
+              const Text("탄수화물"),
+              LinearProgressIndicator(
+                value: _carbs / 325, // 진행 상태 값
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                  Color.fromARGB(255, 118, 193, 120), // 초록색
                 ),
-                IconButton(
-                  onPressed: () => _changeDate(1),
-                  icon: const Icon(Icons.arrow_right),
+                backgroundColor: Colors.grey[300], // 채워지지 않은 부분 색상
+                minHeight: 8.0, // 높이 조정
+              ),
+              Text("${_carbs.toInt()} / 325 g"),
+              const Text("단백질"),
+              LinearProgressIndicator(
+                value: _proteins / 175, // 진행 상태 값
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                  Color.fromARGB(255, 118, 193, 120), // 초록색
                 ),
-                IconButton(
-                  onPressed: () => _selectDate(context),
-                  icon: const Icon(Icons.calendar_today),
+                backgroundColor: Colors.grey[300], // 채워지지 않은 부분 색상
+                minHeight: 8.0, // 높이 조정
+              ),
+              Text("${_proteins.toInt()} / 175 g"),
+              const Text("지방"),
+              LinearProgressIndicator(
+                value: _fats / 78, // 진행 상태 값
+                valueColor: const AlwaysStoppedAnimation<Color>(
+                  Color.fromARGB(255, 118, 193, 120), // 초록색
                 ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Text("칼로리"),
-            LinearProgressIndicator(
-              value: _calories / 3000, // 진행 상태 값
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color.fromARGB(255, 118, 193, 120)), // 초록색
-              backgroundColor: Colors.white, // 채워지지 않은 부분을 흰색으로 설정
-            ),
-            Text("${_calories.toInt()} / 3000 kcal"),
-            const Text("탄수화물"),
-            LinearProgressIndicator(
-              value: _carbs / 3000, // 진행 상태 값
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color.fromARGB(255, 118, 193, 120)),
-              backgroundColor: Colors.white,
-            ),
-            Text("${_carbs.toInt()} / 500 g"),
-            const Text("단백질"),
-            LinearProgressIndicator(
-              value: _proteins / 200, // 진행 상태 값
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color.fromARGB(255, 118, 193, 120)),
-              backgroundColor: Colors.white,
-            ),
-            Text("${_proteins.toInt()} / 200 g"),
-            const Text("지방"),
-            LinearProgressIndicator(
-              value: _fats / 100, // 진행 상태 값
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color.fromARGB(255, 118, 193, 120)),
-              backgroundColor: Colors.white,
-            ),
-            Text("${_fats.toInt()} / 100 g"),
-            const SizedBox(height: 20),
-            _buildMealRow("아침"),
-            _buildMealRow("점심"),
-            _buildMealRow("저녁"),
-            _buildMealRow("간식"),
-          ],
+                backgroundColor: Colors.grey[300], // 채워지지 않은 부분 색상
+                minHeight: 8.0, // 높이 조정
+              ),
+              Text("${_fats.toInt()} / 78 g"),
+              const SizedBox(height: 20),
+              _buildMealRow("아침"),
+              _buildMealRow("점심"),
+              _buildMealRow("저녁"),
+              _buildMealRow("간식"),
+            ],
+          ),
         ),
       ),
     );
