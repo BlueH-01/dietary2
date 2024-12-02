@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:intl/intl.dart';
 
 class NotificationService extends StatefulWidget {
   const NotificationService({super.key});
@@ -19,16 +21,60 @@ class _NotificationServiceState extends State<NotificationService> {
   bool _isNotificationEnabledLunch = false;
   bool _isNotificationEnabledDinner = false;
 
-  bool OnNotificationB = true;
-  bool OnNotificationL = true;
-  bool OnNotificationD = true;
-
   @override
   void initState() {
     super.initState();
     FlutterLocalNotification.init();
     tz.initializeTimeZones();
     FlutterLocalNotification.requestNotificationPermission();
+    _loadNotificationSettings();
+  }
+
+  Future<void> _loadNotificationSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      _selectedTimeBreakfast =
+          _getTimeOfDayFromString(prefs.getString('breakfastTime'));
+      _selectedTimeLunch =
+          _getTimeOfDayFromString(prefs.getString('lunchTime'));
+      _selectedTimeDinner =
+          _getTimeOfDayFromString(prefs.getString('dinnerTime'));
+
+      _isNotificationEnabledBreakfast =
+          prefs.getBool('isNotificationEnabledBreakfast') ?? false;
+      _isNotificationEnabledLunch =
+          prefs.getBool('isNotificationEnabledLunch') ?? false;
+      _isNotificationEnabledDinner =
+          prefs.getBool('isNotificationEnabledDinner') ?? false;
+    });
+  }
+
+  Future<void> _saveNotificationSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setString(
+        'breakfastTime', _selectedTimeBreakfast?.format(context) ?? '');
+    await prefs.setString(
+        'lunchTime', _selectedTimeLunch?.format(context) ?? '');
+    await prefs.setString(
+        'dinnerTime', _selectedTimeDinner?.format(context) ?? '');
+
+    await prefs.setBool(
+        'isNotificationEnabledBreakfast', _isNotificationEnabledBreakfast);
+    await prefs.setBool(
+        'isNotificationEnabledLunch', _isNotificationEnabledLunch);
+    await prefs.setBool(
+        'isNotificationEnabledDinner', _isNotificationEnabledDinner);
+  }
+
+  TimeOfDay? _getTimeOfDayFromString(String? timeString) {
+    if (timeString == null || timeString.isEmpty) {
+      return null;
+    }
+    final format = DateFormat.jm(); //"6:00 AM"
+    final time = format.parse(timeString);
+    return TimeOfDay(hour: time.hour, minute: time.minute);
   }
 
   Future<void> _selectTime(BuildContext context, String t) async {
@@ -36,32 +82,36 @@ class _NotificationServiceState extends State<NotificationService> {
       context: context,
       initialTime: TimeOfDay.now(),
     );
-    if (picked != null && t == "breakfast") {
+    if (picked != null) {
       setState(() {
-        _selectedTimeBreakfast = picked;
-        _isNotificationEnabledBreakfast = true;
+        if (t == "breakfast") {
+          _selectedTimeBreakfast = picked;
+          _isNotificationEnabledBreakfast = true;
+        } else if (t == "lunch") {
+          _selectedTimeLunch = picked;
+          _isNotificationEnabledLunch = true;
+        } else if (t == "dinner") {
+          _selectedTimeDinner = picked;
+          _isNotificationEnabledDinner = true;
+        }
+        _saveNotificationSettings();
       });
-      FlutterLocalNotification.scheduleNotification(picked, 0);
-    } else if (picked != null && t == "lunch") {
-      setState(() {
-        _selectedTimeLunch = picked;
-        _isNotificationEnabledLunch = true;
-      });
-      FlutterLocalNotification.scheduleNotification(picked, 1);
-    } else if (picked != null && t == "dinner") {
-      setState(() {
-        _selectedTimeDinner = picked;
-        _isNotificationEnabledDinner = true;
-      });
-      FlutterLocalNotification.scheduleNotification(picked, 3);
+      FlutterLocalNotification.scheduleNotification(
+          picked, t == "breakfast" ? 0 : (t == "lunch" ? 1 : 2));
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("식사 알림 설정"),
+        title: const Text("식사 알림 설정",
+            style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white)),
+        backgroundColor: const Color.fromARGB(255, 132, 195, 135),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -75,225 +125,112 @@ class _NotificationServiceState extends State<NotificationService> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 125.0,
-                    height: 60.0,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15.0, horizontal: 25.0),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Text(
-                        "아침 식사",
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      _selectTime(context, "breakfast");
-                    },
-                    icon: const Icon(Icons.edit, color: Colors.grey),
-                  ),
-                  SizedBox(
-                    child: _selectedTimeBreakfast != null && OnNotificationB
-                        ? Text(
-                            '${_selectedTimeBreakfast!.format(context)}',
-                            style: const TextStyle(fontSize: 18),
-                          )
-                        : Container(
-                            child: Text(
-                              "알림 없음",
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          ),
-                  ),
-                  const SizedBox(width: 20),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _isNotificationEnabledBreakfast =
-                            !_isNotificationEnabledBreakfast;
-
-                        if (_selectedTimeBreakfast != null) {
-                          TimeOfDay time = _selectedTimeBreakfast as TimeOfDay;
-
-                          if (_isNotificationEnabledBreakfast) {
-                            FlutterLocalNotification.scheduleNotification(
-                                time, 0);
-                            OnNotificationB = true;
-                          } else {
-                            FlutterLocalNotification
-                                .flutterLocalNotificationsPlugin
-                                .cancel(0);
-                            OnNotificationB = false;
-                          }
-                        }
-                      });
-                    },
-                    icon: Icon(
-                      _isNotificationEnabledBreakfast
-                          ? Icons.notifications_active
-                          : Icons.notifications_off,
-                      color: Colors.black,
-                      size: 40,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 80),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 125.0,
-                    height: 60.0,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15.0, horizontal: 25.0),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Text(
-                        "점심 식사",
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      _selectTime(context, "lunch");
-                    },
-                    icon: const Icon(Icons.edit, color: Colors.grey),
-                  ),
-                  SizedBox(
-                    child: _selectedTimeLunch != null && OnNotificationL
-                        ? Text(
-                            '${_selectedTimeLunch!.format(context)}',
-                            style: const TextStyle(fontSize: 18),
-                          )
-                        : Container(
-                            child: Text(
-                              "알림 없음",
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          ),
-                  ),
-                  const SizedBox(width: 20),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _isNotificationEnabledLunch =
-                            !_isNotificationEnabledLunch;
-
-                        if (_selectedTimeLunch != null) {
-                          TimeOfDay time = _selectedTimeLunch as TimeOfDay;
-
-                          if (_isNotificationEnabledLunch) {
-                            FlutterLocalNotification.scheduleNotification(
-                                time, 1);
-                            OnNotificationL = true;
-                          } else {
-                            FlutterLocalNotification
-                                .flutterLocalNotificationsPlugin
-                                .cancel(1);
-                            OnNotificationL = false;
-                          }
-                        }
-                      });
-                    },
-                    icon: Icon(
-                      _isNotificationEnabledLunch
-                          ? Icons.notifications_active
-                          : Icons.notifications_off,
-                      color: Colors.black,
-                      size: 40,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 80),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 125.0,
-                    height: 60.0,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 15.0, horizontal: 25.0),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      child: Text(
-                        "저녁 식사",
-                        style: const TextStyle(fontSize: 18),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      _selectTime(context, "dinner");
-                    },
-                    icon: const Icon(Icons.edit, color: Colors.grey),
-                  ),
-                  SizedBox(
-                    child: _selectedTimeDinner != null && OnNotificationD
-                        ? Text(
-                            '${_selectedTimeDinner!.format(context)}',
-                            style: const TextStyle(fontSize: 18),
-                          )
-                        : Container(
-                            child: Text(
-                              "알림 없음",
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          ),
-                  ),
-                  const SizedBox(width: 20),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _isNotificationEnabledDinner =
-                            !_isNotificationEnabledDinner;
-
-                        if (_selectedTimeDinner != null) {
-                          TimeOfDay time = _selectedTimeDinner as TimeOfDay;
-
-                          if (_isNotificationEnabledDinner) {
-                            FlutterLocalNotification.scheduleNotification(
-                                time, 2);
-                            OnNotificationD = true;
-                          } else {
-                            FlutterLocalNotification
-                                .flutterLocalNotificationsPlugin
-                                .cancel(2);
-                            OnNotificationD = false;
-                          }
-                        }
-                      });
-                    },
-                    icon: Icon(
-                      _isNotificationEnabledDinner
-                          ? Icons.notifications_active
-                          : Icons.notifications_off,
-                      color: Colors.black,
-                      size: 40,
-                    ),
-                  ),
-                ],
-              ),
+              _buildNotificationRow("아침 식사", "breakfast",
+                  _selectedTimeBreakfast, _isNotificationEnabledBreakfast, 0),
+              const SizedBox(height: 40),
+              _buildNotificationRow("점심 식사", "lunch", _selectedTimeLunch,
+                  _isNotificationEnabledLunch, 1),
+              const SizedBox(height: 40),
+              _buildNotificationRow("저녁 식사", "dinner", _selectedTimeDinner,
+                  _isNotificationEnabledDinner, 2),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildNotificationRow(String title, String type,
+      TimeOfDay? selectedTime, bool isEnabled, int id) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: 125.0,
+          height: 60.0,
+          child: Container(
+            padding:
+                const EdgeInsets.symmetric(vertical: 15.0, horizontal: 25.0),
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 132, 195, 135),
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        IconButton(
+          onPressed: () {
+            _selectTime(context, type);
+          },
+          icon: const Icon(Icons.edit, color: Colors.grey),
+        ),
+        SizedBox(
+          child: selectedTime != null && isEnabled
+              ? Text(
+                  selectedTime.format(context),
+                  style: const TextStyle(fontSize: 18),
+                )
+              : const Text(
+                  "알림 없음",
+                  style: TextStyle(fontSize: 18),
+                ),
+        ),
+        const SizedBox(width: 20),
+        IconButton(
+          onPressed: () {
+            setState(() {
+              if (type == "breakfast") {
+                _isNotificationEnabledBreakfast =
+                    !_isNotificationEnabledBreakfast;
+              } else if (type == "lunch") {
+                _isNotificationEnabledLunch = !_isNotificationEnabledLunch;
+              } else if (type == "dinner") {
+                _isNotificationEnabledDinner = !_isNotificationEnabledDinner;
+              }
+              if (selectedTime != null) {
+                if (type == "breakfast") {
+                  if (_isNotificationEnabledBreakfast) {
+                    FlutterLocalNotification.scheduleNotification(
+                        selectedTime, 0);
+                  } else {
+                    FlutterLocalNotification.flutterLocalNotificationsPlugin
+                        .cancel(0);
+                  }
+                } else if (type == "lunch") {
+                  if (_isNotificationEnabledLunch) {
+                    FlutterLocalNotification.scheduleNotification(
+                        selectedTime, 1);
+                  } else {
+                    FlutterLocalNotification.flutterLocalNotificationsPlugin
+                        .cancel(1);
+                  }
+                } else if (type == "dinner") {
+                  if (_isNotificationEnabledDinner) {
+                    FlutterLocalNotification.scheduleNotification(
+                        selectedTime, 2);
+                  } else {
+                    FlutterLocalNotification.flutterLocalNotificationsPlugin
+                        .cancel(2);
+                  }
+                }
+                _saveNotificationSettings();
+              }
+            });
+          },
+          icon: Icon(
+            isEnabled ? Icons.notifications_active : Icons.notifications_off,
+            color: Colors.black,
+            size: 40,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -309,11 +246,7 @@ class FlutterLocalNotification {
         AndroidInitializationSettings('mipmap/ic_launcher');
 
     const DarwinInitializationSettings iosInitializationSettings =
-        DarwinInitializationSettings(
-      requestAlertPermission: false,
-      requestBadgePermission: false,
-      requestSoundPermission: false,
-    );
+        DarwinInitializationSettings();
 
     const InitializationSettings initializationSettings =
         InitializationSettings(
@@ -335,10 +268,6 @@ class FlutterLocalNotification {
         );
   }
 
-  Future<void> _cancelNotification(int id) async {
-    await flutterLocalNotificationsPlugin.cancel(id);
-  }
-
   static Future<void> scheduleNotification(TimeOfDay time, int id) async {
     final now = DateTime.now();
 
@@ -351,7 +280,7 @@ class FlutterLocalNotification {
     );
 
     if (scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(Duration(days: 1));
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
 
     final tz.TZDateTime tzScheduledDate =
