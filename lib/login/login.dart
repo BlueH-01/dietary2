@@ -135,6 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           key: _formKey,
                           child: Column(
                             children: [
+                              const SizedBox(height: 9),
                               TextFormField(
                                 key: const Key('login_email'),
                                 validator: (value) {
@@ -179,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   contentPadding: EdgeInsets.all(10),
                                 ),
                               ),
-                              const SizedBox(height: 8), // 공간 조정
+                              const SizedBox(height: 15), // 공간 조정
                               TextFormField(
                                 obscureText: true,
                                 key: const Key('login_password'),
@@ -348,7 +349,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           gradient: const LinearGradient(
                               colors: [
                                 Color.fromARGB(
-                                    255, 213, 232, 210), //화살표 동그라미 색상
+                                    255, 233, 236, 232), //화살표 동그라미 색상
                                 Color.fromARGB(255, 213, 232, 210),
                               ],
                               begin: Alignment.topLeft,

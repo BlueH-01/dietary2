@@ -80,16 +80,23 @@ class _SignupScreenState extends State<SignupScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Container(
-          padding: const EdgeInsets.only(left: 65), // 왼쪽 여백을 추가하여 우측으로 미세 이동
+          padding: const EdgeInsets.only(left: 60), // 왼쪽 여백을 추가하여 우측으로 미세 이동
           child: const Text(
             '회원가입',
             style: TextStyle(
+              fontSize: 24,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
         ),
-        backgroundColor: const Color.fromARGB(255, 213, 232, 210),
+        backgroundColor: const Color.fromARGB(255, 132, 195, 135),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ), // 앱바 하단 모서리 둥글게 처리
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -267,7 +274,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   child: ElevatedButton(
                     onPressed: _trySignup,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 118, 193, 120),
+                      backgroundColor: const Color.fromARGB(255, 132, 195, 135),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 50, vertical: 15),
                       shape: RoundedRectangleBorder(
