@@ -5,10 +5,6 @@ import '../food_register/food_regi.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../settings/notify.dart';
 
-<<<<<<< HEAD
-//import 'package:dietary2/foodlist/food_list.dart'; // DietaryScreen 파일 import
-=======
->>>>>>> f3c9626 (조민기)
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -214,10 +210,6 @@ class _MainScreenState extends State<MainScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Card(
         elevation: 4.0, // 그림자 효과
-<<<<<<< HEAD
-
-=======
->>>>>>> f3c9626 (조민기)
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
         ),
@@ -230,23 +222,12 @@ class _MainScreenState extends State<MainScreen> {
           subtitle: Text(
             "${meal['calories']} kcal",
             style: const TextStyle(fontSize: 12),
-<<<<<<< HEAD
-          ),
-          trailing: IconButton(
-            onPressed: () {
-              _openFoodSelectionScreen(mealTime);
-            },
-            icon: const Icon(Icons.edit,
-                color: Color.fromARGB(255, 132, 195, 135)),
-          ),
-=======
           ),
           trailing: IconButton(
             onPressed: () => _openFoodSelectionScreen(mealTime),
             icon: const Icon(Icons.edit,
                 color: Color.fromARGB(255, 132, 195, 135)),
           ),
->>>>>>> f3c9626 (조민기)
         ),
       ),
     );
@@ -302,31 +283,9 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-<<<<<<< HEAD
-        title: const Text(
-          "식단 기록",
-          style: TextStyle(
-              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 132, 195, 135), // 앱바 색상
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const UserProfileScreen(),
-                ),
-              );
-            },
-            icon: const Icon(Icons.settings, size: 30, color: Colors.white),
-          ),
-=======
         title: const Text("Dietary",
         style: TextStyle(
           fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
@@ -342,71 +301,8 @@ class _MainScreenState extends State<MainScreen> {
                 ),);
             },
             icon: const Icon(Icons.settings, size: 30, color: Colors.white),),
->>>>>>> f3c9626 (조민기)
         ],
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(20),
-          ),
-        ), // 앱바 하단 모서리 둥글게 처리
       ),
-<<<<<<< HEAD
-      body: SingleChildScrollView(
-        // Add scroll functionality
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    onPressed: () => _changeDate(-1),
-                    icon: const Icon(Icons.arrow_left),
-                  ),
-                  Text(
-                    "${_selectedDate.toLocal()}".split(' ')[0],
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  IconButton(
-                    onPressed: () => _changeDate(1),
-                    icon: const Icon(Icons.arrow_right),
-                  ),
-                  IconButton(
-                    onPressed: () => _selectDate(context),
-                    icon: const Icon(Icons.calendar_today),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              const Text("칼로리"),
-              LinearProgressIndicator(
-                value: _calories / 2500, // 진행 상태 값
-                valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color.fromARGB(255, 118, 193, 120), // 초록색
-                ),
-                backgroundColor: Colors.grey[300], // 채워지지 않은 부분 색상
-                minHeight: 8.0, // 높이 조정
-              ),
-              Text("${_calories.toInt()} / 2500 kcal"),
-              const Text("탄수화물"),
-              LinearProgressIndicator(
-                value: _carbs / 325, // 진행 상태 값
-                valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color.fromARGB(255, 118, 193, 120), // 초록색
-                ),
-                backgroundColor: Colors.grey[300], // 채워지지 않은 부분 색상
-                minHeight: 8.0, // 높이 조정
-              ),
-              Text("${_carbs.toInt()} / 325 g"),
-              const Text("단백질"),
-              LinearProgressIndicator(
-                value: _proteins / 175, // 진행 상태 값
-                valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color.fromARGB(255, 118, 193, 120), // 초록색
-=======
         
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -424,31 +320,11 @@ class _MainScreenState extends State<MainScreen> {
                 IconButton(
                   onPressed: () => _changeDate(1),
                   icon: const Icon(Icons.arrow_right),
->>>>>>> f3c9626 (조민기)
                 ),
-                backgroundColor: Colors.grey[300], // 채워지지 않은 부분 색상
-                minHeight: 8.0, // 높이 조정
-              ),
-              Text("${_proteins.toInt()} / 175 g"),
-              const Text("지방"),
-              LinearProgressIndicator(
-                value: _fats / 78, // 진행 상태 값
-                valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color.fromARGB(255, 118, 193, 120), // 초록색
+                IconButton(
+                  onPressed: () => _selectDate(context),
+                  icon: const Icon(Icons.calendar_today),
                 ),
-<<<<<<< HEAD
-                backgroundColor: Colors.grey[300], // 채워지지 않은 부분 색상
-                minHeight: 8.0, // 높이 조정
-              ),
-              Text("${_fats.toInt()} / 78 g"),
-              const SizedBox(height: 20),
-              _buildMealRow("아침"),
-              _buildMealRow("점심"),
-              _buildMealRow("저녁"),
-              _buildMealRow("간식"),
-            ],
-          ),
-=======
               ],
             ),
             const SizedBox(height: 20),
@@ -459,7 +335,6 @@ class _MainScreenState extends State<MainScreen> {
             const SizedBox(height: 20),
             ..._mealData.keys.map(_buildMealRow).toList(),
           ],
->>>>>>> f3c9626 (조민기)
         ),
       ),
     );
@@ -489,8 +364,4 @@ class UserDataService {
       return null;
     }
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> f3c9626 (조민기)
