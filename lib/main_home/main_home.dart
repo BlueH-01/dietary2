@@ -5,6 +5,27 @@ import '../food_register/food_regi.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../settings/notify.dart';
 
+// 초과된 부분을 자르는 클리퍼
+class _ExcessClipper extends CustomClipper<Rect> {
+  final double startRatio;
+  final double endRatio;
+
+  _ExcessClipper(this.startRatio, this.endRatio);
+
+  @override
+  Rect getClip(Size size) {
+    double start = size.width * startRatio;
+    double end = size.width * endRatio;
+    return Rect.fromLTRB(start, 0, end, size.height);
+  }
+
+  @override
+  bool shouldReclip(_ExcessClipper oldClipper) {
+    return startRatio != oldClipper.startRatio ||
+        endRatio != oldClipper.endRatio;
+  }
+}
+
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -193,16 +214,51 @@ class _MainScreenState extends State<MainScreen> {
 
   // 식사 데이터를 표시하는 UI
   Widget _buildProgressBar(String label, double currentValue, double goal) {
+    double maxValue = goal * 1.3; // 최대치: goal의 130%
+    double progress = currentValue / maxValue; // 전체 막대의 진행률
+    double normalProgress =
+        (currentValue > goal ? goal : currentValue) / maxValue; // 정상 범위 진행률
+    double excessProgress =
+        (currentValue > goal ? currentValue - goal : 0) / maxValue; // 초과 범위 진행률
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label),
-        LinearProgressIndicator(
-          value: currentValue / goal,
-          valueColor: const AlwaysStoppedAnimation<Color>(
-              Color.fromARGB(255, 118, 193, 120)), // 초록색
-          backgroundColor: Colors.grey[300], // 채워지지 않은 부분
-          minHeight: 8.0, // 높이 조정
+        Stack(
+          children: [
+            // 기본 회색 배경 (전체 Progress Bar)
+            LinearProgressIndicator(
+              value: 1.0,
+              backgroundColor: Colors.grey[300],
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                Colors.grey, // 기본 회색
+              ),
+              minHeight: 8.0,
+            ),
+            // 초록색 정상 범위 Progress Bar
+            LinearProgressIndicator(
+              value: normalProgress,
+              backgroundColor: Colors.transparent,
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                Color.fromARGB(255, 118, 193, 120), // 초록색
+              ),
+              minHeight: 8.0,
+            ),
+            // 빨간색 초과 범위 Progress Bar
+            if (currentValue > goal)
+              ClipRect(
+                clipper: _ExcessClipper(normalProgress, progress),
+                child: LinearProgressIndicator(
+                  value: 1.0,
+                  backgroundColor: Colors.transparent,
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    Colors.red, // 초과된 부분 빨간색
+                  ),
+                  minHeight: 8.0,
+                ),
+              ),
+          ],
         ),
         Text("${currentValue.toInt()} / ${goal.toInt()}"),
       ],
