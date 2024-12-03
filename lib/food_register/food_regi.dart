@@ -374,28 +374,51 @@ class _DietaryScreenState extends State<DietaryScreen> {
                                   onPressed: () => _toggleFavorite(doc),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color:
-                                      Color.fromARGB(255, 201, 201, 201)),
-                                  onPressed: () async {
-                                    try {
-                                      await _firestore
-                                          .collection('foods')
-                                          .doc(doc.id)
-                                          .delete();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                            content: Text('음식이 삭제되었습니다.')),
-                                      );
-                                    } catch (e) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(content: Text('삭제 실패: $e')),
-                                      );
-                                    }
+                                  icon: const Icon(Icons.delete, color: Color.fromARGB(255, 201, 201, 201)),
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: const Text('삭제 확인'),
+                                          content: const Text('정말로 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다.'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(context), // 팝업 닫기
+                                              child: const Text(
+                                                '취소',
+                                                style: TextStyle(color: Colors.grey),
+                                              ),
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () async {
+                                                Navigator.pop(context); // 팝업 닫기
+                                                try {
+                                                  await _firestore.collection('foods').doc(doc.id).delete();
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    const SnackBar(content: Text('음식이 삭제되었습니다.')),
+                                                  );
+                                                } catch (e) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(content: Text('삭제 실패: $e')),
+                                                  );
+                                                }
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: const Color.fromARGB(255, 118, 193, 120),
+                                              ),
+                                              child: const Text(
+                                                '예',
+                                                style: TextStyle(color: Colors.white),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
                                   },
                                 ),
+
                               ],
                             ),
                           ],
