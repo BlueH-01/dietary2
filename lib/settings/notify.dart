@@ -111,7 +111,14 @@ class _NotificationServiceState extends State<NotificationService> {
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Colors.white)),
+        centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 132, 195, 135),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -158,7 +165,7 @@ class _NotificationServiceState extends State<NotificationService> {
             child: Text(
               title,
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
