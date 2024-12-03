@@ -5,7 +5,6 @@ import '../food_register/food_regi.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../settings/notify.dart';
 
-
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -34,7 +33,7 @@ class _MainScreenState extends State<MainScreen> {
 
   bool isLoading = true; //data 로딩 상태
   Map<String, dynamic>? userData; // userData
-  
+
   // Firebase에서 currentWeight 가져와서 목표값 계산
   Future<void> _fetchDailyGoal() async {
     try {
@@ -45,23 +44,29 @@ class _MainScreenState extends State<MainScreen> {
         double targetWeight = userData!['targetWeight'];
         double weightDiff = targetWeight - currentWeight;
         // 목표 체중과 현재 체중의 차
-        
+
         setState(() {
-          if (weightDiff > 0) { // 체중 증가 목표
+          if (weightDiff > 0) {
+            // 체중 증가 목표
             dailyCalories = currentWeight * 24 * 1.7;
             dailyProteins = (dailyCalories * 0.35) / 4;
             dailyFats = (dailyCalories * 0.2) / 9;
-            dailyCarbs = (dailyCalories - (dailyProteins * 4 + dailyFats * 9)) / 4;
-          } else if (weightDiff < 0){ // 체중 감소 목표
+            dailyCarbs =
+                (dailyCalories - (dailyProteins * 4 + dailyFats * 9)) / 4;
+          } else if (weightDiff < 0) {
+            // 체중 감소 목표
             dailyCalories = currentWeight * 24 * 1.3;
             dailyProteins = (dailyCalories * 0.4) / 4;
             dailyFats = (dailyCalories * 0.2) / 9;
-            dailyCarbs = (dailyCalories - (dailyProteins * 4 + dailyFats * 9)) / 4;
-          } else { // 체중 유지 목표
+            dailyCarbs =
+                (dailyCalories - (dailyProteins * 4 + dailyFats * 9)) / 4;
+          } else {
+            // 체중 유지 목표
             dailyCalories = currentWeight * 24 * 1.5;
             dailyProteins = (dailyCalories * 0.25) / 4;
             dailyFats = (dailyCalories * 0.3) / 9;
-            dailyCarbs = (dailyCalories - (dailyProteins * 4 + dailyFats * 9)) / 4;
+            dailyCarbs =
+                (dailyCalories - (dailyProteins * 4 + dailyFats * 9)) / 4;
           }
           isLoading = false; // 로딩 상태 해제
         });
@@ -94,6 +99,7 @@ class _MainScreenState extends State<MainScreen> {
       "fats": 0.0,
     };
   }
+
   String _formattedDate() {
     return "${_selectedDate.toLocal()}".split(' ')[0];
   }
@@ -132,11 +138,11 @@ class _MainScreenState extends State<MainScreen> {
     final formattedDate = "${_selectedDate.toLocal()}".split(' ')[0];
     try {
       await _firestore
-      .collection('users')
-      .doc(userId)
-      .collection('daily_data')
-      .doc(formattedDate)
-      .set({
+          .collection('users')
+          .doc(userId)
+          .collection('daily_data')
+          .doc(formattedDate)
+          .set({
         'calories': _calories,
         'carbs': _carbs,
         'proteins': _proteins,
@@ -194,9 +200,9 @@ class _MainScreenState extends State<MainScreen> {
         LinearProgressIndicator(
           value: currentValue / goal,
           valueColor: const AlwaysStoppedAnimation<Color>(
-            Color.fromARGB(255, 118, 193, 120)), // 초록색
-            backgroundColor: Colors.grey[300], // 채워지지 않은 부분
-            minHeight: 8.0, // 높이 조정
+              Color.fromARGB(255, 118, 193, 120)), // 초록색
+          backgroundColor: Colors.grey[300], // 채워지지 않은 부분
+          minHeight: 8.0, // 높이 조정
         ),
         Text("${currentValue.toInt()} / ${goal.toInt()}"),
       ],
@@ -286,24 +292,34 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Dietary",
-        style: TextStyle(
-          fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+        title: const Text(
+          "Dietary",
+          style: TextStyle(
+              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 132, 195, 135),
         actions: [
-          IconButton( // 설정 버튼
-            onPressed: (){
-              Navigator.push(context,
-              MaterialPageRoute(
-                builder: (context) => const UserProfileScreen(),
-                ),);
+          IconButton(
+            // 설정 버튼
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const UserProfileScreen(),
+                ),
+              );
             },
-            icon: const Icon(Icons.settings, size: 30, color: Colors.white),),
+            icon: const Icon(Icons.settings, size: 30, color: Colors.white),
+          ),
         ],
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ),
       ),
-        
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -333,7 +349,7 @@ class _MainScreenState extends State<MainScreen> {
             _buildProgressBar("단백질", _proteins, dailyProteins),
             _buildProgressBar("지방", _fats, dailyFats),
             const SizedBox(height: 20),
-            ..._mealData.keys.map(_buildMealRow).toList(),
+            ..._mealData.keys.map(_buildMealRow),
           ],
         ),
       ),
