@@ -59,12 +59,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Profile',
+        title: const Text('내 정보',
             style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Colors.white)),
+        centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 132, 195, 135),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ),
         elevation: 5,
       ),
       body: Padding(
@@ -90,21 +97,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ),
                 ),
               ),
-              Center(
+              const Center(
                 child: CircleAvatar(
                   radius: 75,
                   backgroundImage: AssetImage('images/profile.png'),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
                 userName ?? 'Loading...',
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
                     color: Color.fromARGB(255, 132, 195, 135)),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               // User details section
               Card(
                 elevation: 5,
@@ -116,14 +123,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   child: Column(
                     children: [
                       _buildInfoRow('나이', '${userAge ?? 'Loading...'}'),
-                      SizedBox(height: 10),
-                      _buildInfoRow('성별', '${userGender ?? 'Loading...'}'),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
+                      _buildInfoRow('성별', userGender ?? 'Loading...'),
+                      const SizedBox(height: 10),
                       _buildInfoRow('키', '${userHeight ?? 'Loading...'}'),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       _buildInfoRow(
                           '현재 몸무게', '${currentWeight ?? 'Loading...'} kg'),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       _buildInfoRow(
                           '목표 몸무게', '${targetWeight ?? 'Loading...'} kg'),
                     ],
@@ -143,14 +150,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Color.fromARGB(255, 132, 195, 135)),
         ),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
               fontSize: 18, fontWeight: FontWeight.w400, color: Colors.black87),
         ),
       ],
