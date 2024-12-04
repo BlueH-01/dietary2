@@ -7,27 +7,6 @@ import 'package:dietary2/firebase_init.dart';
 import 'package:dietary2/data_mg/date_manager.dart';
 import 'package:dietary2/data_mg/goal_manager.dart';
 
-// 초과된 부분을 자르는 클리퍼
-class _ExcessClipper extends CustomClipper<Rect> {
-  final double startRatio;
-  final double endRatio;
-
-  _ExcessClipper(this.startRatio, this.endRatio);
-
-  @override
-  Rect getClip(Size size) {
-    double start = size.width * startRatio;
-    double end = size.width * endRatio;
-    return Rect.fromLTRB(start, 0, end, size.height);
-  }
-
-  @override
-  bool shouldReclip(_ExcessClipper oldClipper) {
-    return startRatio != oldClipper.startRatio ||
-        endRatio != oldClipper.endRatio;
-  }
-}
-
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -42,14 +21,6 @@ class _MainScreenState extends State<MainScreen> {
   late DateManager _dateManager;
   late GoalManager _goalManager;
 
-  // 섭취 영양소
-  double _calories = 0;
-  double _carbs = 0;
-  double _proteins = 0;
-  double _fats = 0;
-
-  late Map<String, Map<String, dynamic>> _mealData;
-
   bool isLoading = true; //data 로딩 상태
   Map<String, dynamic>? userData; // userData
 
@@ -62,47 +33,8 @@ class _MainScreenState extends State<MainScreen> {
         firestore: _firestore, // Firestore 인스턴스 전달
         userId: userId); // 현재 로그인한 ID를 Date Manager에게 전달
     _goalManager = GoalManager(firestore: _firestore, userId: userId);
-    _mealData = _initializeMealData();
     _loadDataForDate(); // 초기 데이터 로드
     _fetchDailyGoal(); // 초기화시 목표 영양값 가져오기
-  }
-
-  // Firebase에서 currentWeight 가져와서 목표값 계산
-  Future<void> _fetchDailyGoal() async {
-    _goalManager.fetchDailyGoal(
-        onUpdate: ({
-          required double dailyCalories,
-          required double dailyCarbs,
-          required double dailyProteins,
-          required double dailyFats,
-        }) {
-          setState(() {
-            _goalManager.dailyCalories = dailyCalories;
-            _goalManager.dailyCarbs = dailyCarbs;
-            _goalManager.dailyProteins = dailyProteins;
-            _goalManager.dailyFats = dailyFats;
-          });
-        },
-        onError: () {});
-  }
-
-  Map<String, Map<String, dynamic>> _initializeMealData() {
-    return {
-      "아침": _emptyMeal(),
-      "점심": _emptyMeal(),
-      "저녁": _emptyMeal(),
-      "간식": _emptyMeal(),
-    };
-  }
-
-  Map<String, dynamic> _emptyMeal() {
-    return {
-      "name": "없음",
-      "calories": 0.0,
-      "carbs": 0.0,
-      "proteins": 0.0,
-      "fats": 0.0,
-    };
   }
 
   String _formattedDate() {
@@ -114,40 +46,20 @@ class _MainScreenState extends State<MainScreen> {
     _dateManager.loadDataForDate(
       onDataLoaded: (data) {
         setState(() {
-          _calories = (data['calories'] ?? 0).toDouble();
-          _carbs = (data['carbs'] ?? 0).toDouble();
-          _proteins = (data['proteins'] ?? 0).toDouble();
-          _fats = (data['fats'] ?? 0).toDouble();
-          _mealData = Map<String, Map<String, dynamic>>.from(
-              data['meals'] ?? _initializeMealData());
+          _dateManager.updateTotalData();
         });
       },
-      onNoData: _resetData,
+      onNoData: () {
+        setState(() {
+          _dateManager.resetData();
+        });
+      }
     );
   }
 
   // Firestore에 데이터 저장
   void _saveDataForDate() {
-    final data = {
-      'calories': _calories,
-      'carbs': _carbs,
-      'proteins': _proteins,
-      'fats': _fats,
-      'meals': _mealData,
-    };
-
-    _dateManager.saveDataForDate(data); // DateManager 사용
-  }
-
-  // 데이터 초기화
-  void _resetData() {
-    setState(() {
-      _calories = 0;
-      _carbs = 0;
-      _proteins = 0;
-      _fats = 0;
-      _mealData = _initializeMealData();
-    });
+    _dateManager.saveDataForDate(); // DateManager 사용
   }
 
   // 날짜 변경 함수
@@ -168,6 +80,49 @@ class _MainScreenState extends State<MainScreen> {
         _loadDataForDate();
       }),
     );
+  }
+
+    //음식 선택 화면으로 이동
+  Future<void> openFoodSelectionScreen(String mealTime) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const DietaryScreen(),
+      ),
+    );
+
+    if (result != null && result is Map<String, dynamic>) {
+      setState(() {
+        _dateManager.mealData[mealTime] = {
+          "name": result['name'],
+          "calories": result['calories'],
+          "carbs": result['carbs'],
+          "proteins": result['protein'],
+          "fats": result['fat'],
+        };
+        _dateManager.updateTotalData();
+        _saveDataForDate(); // 저장
+      });
+    }
+  }
+
+    // Firebase에서 currentWeight 가져와서 목표값 계산
+  Future<void> _fetchDailyGoal() async {
+    _goalManager.fetchDailyGoal(
+        onUpdate: ({
+          required double dailyCalories,
+          required double dailyCarbs,
+          required double dailyProteins,
+          required double dailyFats,
+        }) {
+          setState(() {
+            _goalManager.dailyCalories = dailyCalories;
+            _goalManager.dailyCarbs = dailyCarbs;
+            _goalManager.dailyProteins = dailyProteins;
+            _goalManager.dailyFats = dailyFats;
+          });
+        },
+        onError: () {});
   }
 
   // 식사 데이터를 표시하는 UI
@@ -286,7 +241,7 @@ class _MainScreenState extends State<MainScreen> {
 
   // 식사 데이터를 표시하는 UI2
   Widget buildMealRow(String mealTime) {
-    final meal = _mealData[mealTime]!;
+    final meal = _dateManager.mealData[mealTime]!;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Card(
@@ -312,47 +267,6 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
     );
-  }
-
-  //음식 선택 화면으로 이동
-  Future<void> openFoodSelectionScreen(String mealTime) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const DietaryScreen(),
-      ),
-    );
-
-    if (result != null && result is Map<String, dynamic>) {
-      setState(() {
-        _mealData[mealTime] = {
-          "name": result['name'],
-          "calories": result['calories'],
-          "carbs": result['carbs'],
-          "proteins": result['protein'],
-          "fats": result['fat'],
-        };
-        updateTotalData();
-        _saveDataForDate(); // 저장
-      });
-    }
-  }
-
-  // 전체 합산 데이터 업데이트
-  void updateTotalData() {
-    setState(() {
-      _calories = 0;
-      _carbs = 0;
-      _proteins = 0;
-      _fats = 0;
-
-      _mealData.forEach((key, value) {
-        _calories += value['calories'];
-        _carbs += value['carbs'];
-        _proteins += value['proteins'];
-        _fats += value['fats'];
-      });
-    });
   }
 
   @override
@@ -411,12 +325,12 @@ class _MainScreenState extends State<MainScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            _buildProgressBar("칼로리", _calories, _goalManager.dailyCalories),
-            _buildProgressBar("탄수화물", _carbs, _goalManager.dailyCarbs),
-            _buildProgressBar("단백질", _proteins, _goalManager.dailyProteins),
-            _buildProgressBar("지방", _fats, _goalManager.dailyFats),
+            _buildProgressBar("칼로리", _dateManager.calories, _goalManager.dailyCalories),
+            _buildProgressBar("탄수화물", _dateManager.carbs, _goalManager.dailyCarbs),
+            _buildProgressBar("단백질", _dateManager.proteins, _goalManager.dailyProteins),
+            _buildProgressBar("지방", _dateManager.fats, _goalManager.dailyFats),
             const SizedBox(height: 20),
-            ...["아침", "점심", "저녁"].map(buildMealRow),
+            ...["아침", "점심", "저녁", "간식"].map(buildMealRow),
           ],
         ),
       ),
@@ -446,5 +360,26 @@ class UserDataService {
       print('Error fetching user data: $e');
       return null;
     }
+  }
+}
+
+// 초과된 부분을 자르는 클리퍼
+class _ExcessClipper extends CustomClipper<Rect> {
+  final double startRatio;
+  final double endRatio;
+
+  _ExcessClipper(this.startRatio, this.endRatio);
+
+  @override
+  Rect getClip(Size size) {
+    double start = size.width * startRatio;
+    double end = size.width * endRatio;
+    return Rect.fromLTRB(start, 0, end, size.height);
+  }
+
+  @override
+  bool shouldReclip(_ExcessClipper oldClipper) {
+    return startRatio != oldClipper.startRatio ||
+        endRatio != oldClipper.endRatio;
   }
 }
