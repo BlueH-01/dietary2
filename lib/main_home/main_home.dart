@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../food_register/food_regi.dart';
 import 'package:dietary2/firebase_init.dart';
 import 'package:dietary2/data_mg/date_manager.dart';
+import 'package:dietary2/data_mg/goal_manager.dart';
 
 // 초과된 부분을 자르는 클리퍼
 class _ExcessClipper extends CustomClipper<Rect> {
@@ -38,6 +39,7 @@ class _MainScreenState extends State<MainScreen> {
   late FirebaseFirestore _firestore;
   late String userId;
   late DateManager _dateManager;
+  late GoalManager _goalManager;
 
   // 섭취 영양소
   double _calories = 0;
@@ -64,6 +66,9 @@ class _MainScreenState extends State<MainScreen> {
     _dateManager = DateManager(
       firestore: _firestore, // Firestore 인스턴스 전달
       userId: userId); // 현재 로그인한 ID를 Date Manager에게 전달
+    _goalManager = GoalManager(
+      firestore: _firestore,
+      userId: userId);
     _mealData = _initializeMealData();
     _loadDataForDate(); // 초기 데이터 로드
     _fetchDailyGoal(); // 초기화시 목표 영양값 가져오기
@@ -71,52 +76,21 @@ class _MainScreenState extends State<MainScreen> {
 
   // Firebase에서 currentWeight 가져와서 목표값 계산
   Future<void> _fetchDailyGoal() async {
-    try {
-      final userDoc = await _firestore
-      .collection('users')
-      .doc(userId)
-      .get();
-      if (userDoc.exists) {
-        userData = userDoc.data() as Map<String, dynamic>;
-        double currentWeight = userData!['currentWeight'];
-        double targetWeight = userData!['targetWeight'];
-        double weightDiff = targetWeight - currentWeight;
-        // 목표 체중과 현재 체중의 차
-
+    _goalManager.fetchDailyGoal(
+      onUpdate: ({
+        required double dailyCalories,
+        required double dailyCarbs,
+        required double dailyProteins,
+        required double dailyFats,
+      }){
         setState(() {
-          if (weightDiff > 0) {
-            // 체중 증가 목표
-            dailyCalories = currentWeight * 24 * 1.7;
-            dailyProteins = (dailyCalories * 0.35) / 4;
-            dailyFats = (dailyCalories * 0.2) / 9;
-            dailyCarbs =
-                (dailyCalories - (dailyProteins * 4 + dailyFats * 9)) / 4;
-          } else if (weightDiff < 0) {
-            // 체중 감소 목표
-            dailyCalories = currentWeight * 24 * 1.3;
-            dailyProteins = (dailyCalories * 0.4) / 4;
-            dailyFats = (dailyCalories * 0.2) / 9;
-            dailyCarbs =
-                (dailyCalories - (dailyProteins * 4 + dailyFats * 9)) / 4;
-          } else {
-            // 체중 유지 목표
-            dailyCalories = currentWeight * 24 * 1.5;
-            dailyProteins = (dailyCalories * 0.25) / 4;
-            dailyFats = (dailyCalories * 0.3) / 9;
-            dailyCarbs =
-                (dailyCalories - (dailyProteins * 4 + dailyFats * 9)) / 4;
-          }
-          isLoading = false; // 로딩 상태 해제
+          this.dailyCalories = dailyCalories;
+          this.dailyCarbs = dailyCarbs;
+          this.dailyProteins = dailyProteins;
+          this.dailyFats = dailyFats;
         });
-      } else {
-        print('사용자 데이터가 없습니다.');
-      }
-    } catch (e) {
-      print('Error fetching user data: $e');
-      setState(() {
-        isLoading = false;
-      });
-    }
+      }, 
+      onError:(){});
   }
 
   Map<String, Map<String, dynamic>> _initializeMealData() {
