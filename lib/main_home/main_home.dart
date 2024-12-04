@@ -16,7 +16,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   final FirebaseInit _firebaseInit = FirebaseInit.instance;
-  late FirebaseFirestore _firestore;
+  late FirebaseFirestore _firestore = _firebaseInit.firestore;
   late String userId;
   late DateManager _dateManager;
   late GoalManager _goalManager;
@@ -46,12 +46,14 @@ class _MainScreenState extends State<MainScreen> {
     _dateManager.loadDataForDate(
       onDataLoaded: (data) {
         setState(() {
-          _dateManager.updateTotalData();
+          _dateManager
+          .nutritionManager.updateTotalData();
         });
       },
       onNoData: () {
         setState(() {
-          _dateManager.resetData();
+          _dateManager
+          .nutritionManager.resetData();
         });
       }
     );
@@ -93,14 +95,16 @@ class _MainScreenState extends State<MainScreen> {
 
     if (result != null && result is Map<String, dynamic>) {
       setState(() {
-        _dateManager.mealData[mealTime] = {
+        _dateManager
+        .nutritionManager.mealData[mealTime] = {
           "name": result['name'],
           "calories": result['calories'],
           "carbs": result['carbs'],
           "proteins": result['protein'],
           "fats": result['fat'],
         };
-        _dateManager.updateTotalData();
+        _dateManager
+        .nutritionManager.updateTotalData();
         _saveDataForDate(); // 저장
       });
     }
@@ -241,7 +245,7 @@ class _MainScreenState extends State<MainScreen> {
 
   // 식사 데이터를 표시하는 UI2
   Widget buildMealRow(String mealTime) {
-    final meal = _dateManager.mealData[mealTime]!;
+    final meal = _dateManager.nutritionManager.mealData[mealTime]!;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Card(
