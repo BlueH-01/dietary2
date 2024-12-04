@@ -1,13 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // FirebaseAuth 추가
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart'; // FirebaseStorage 추가
+import 'package:firebase_storage/firebase_storage.dart'; 
+// FirebaseStorage 추가
 
 class FirebaseInit {
   static final FirebaseInit _instance = FirebaseInit._internal();
   late FirebaseFirestore firestore;
   late FirebaseAuth auth; // FirebaseAuth 인스턴스 추가
   late FirebaseStorage storage; // FirebaseStorage 인스턴스 추가
+
+  // Singleton 접근을 위한 getter 추가
+  static FirebaseInit get instance => _instance;
 
   factory FirebaseInit() {
     return _instance;
