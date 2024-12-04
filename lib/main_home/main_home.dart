@@ -49,12 +49,6 @@ class _MainScreenState extends State<MainScreen> {
 
   late Map<String, Map<String, dynamic>> _mealData;
 
-  // 목표 영양소
-  double dailyCalories = 3000;
-  double dailyCarbs = 200;
-  double dailyProteins = 200;
-  double dailyFats = 200;
-
   bool isLoading = true; //data 로딩 상태
   Map<String, dynamic>? userData; // userData
 
@@ -84,10 +78,10 @@ class _MainScreenState extends State<MainScreen> {
         required double dailyFats,
       }){
         setState(() {
-          this.dailyCalories = dailyCalories;
-          this.dailyCarbs = dailyCarbs;
-          this.dailyProteins = dailyProteins;
-          this.dailyFats = dailyFats;
+          _goalManager.dailyCalories = dailyCalories;
+          _goalManager.dailyCarbs = dailyCarbs;
+          _goalManager.dailyProteins = dailyProteins;
+          _goalManager.dailyFats = dailyFats;
         });
       }, 
       onError:(){});
@@ -594,10 +588,13 @@ class _MainScreenState extends State<MainScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            _buildProgressBar("칼로리", _calories, dailyCalories),
-            _buildProgressBar("탄수화물", _carbs, dailyCarbs),
-            _buildProgressBar("단백질", _proteins, dailyProteins),
-            _buildProgressBar("지방", _fats, dailyFats),
+            _buildProgressBar("칼로리", 
+            _calories, _goalManager.dailyCalories),
+            _buildProgressBar("탄수화물", 
+            _carbs, _goalManager.dailyCarbs),
+            _buildProgressBar("단백질", 
+            _proteins, _goalManager.dailyProteins),
+            _buildProgressBar("지방", _fats, _goalManager.dailyFats),
             const SizedBox(height: 20),
             ...["아침","점심","저녁"].map(buildMealRow),
           ],
