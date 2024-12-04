@@ -2,8 +2,8 @@ import 'package:dietary2/settings/myPage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../food_register/food_regi.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../settings/notify.dart';
+import 'package:dietary2/firebase_init.dart';
+import 'package:dietary2/data_mg/date_manager.dart';
 
 // 초과된 부분을 자르는 클리퍼
 class _ExcessClipper extends CustomClipper<Rect> {
@@ -34,9 +34,10 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  DateTime _selectedDate = DateTime.now();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+  final FirebaseInit _firebaseInit = FirebaseInit.instance;
+  late FirebaseFirestore _firestore;
+  late String userId;
+  late DateManager _dateManager;
 
   // 섭취 영양소
   double _calories = 0;
@@ -55,10 +56,26 @@ class _MainScreenState extends State<MainScreen> {
   bool isLoading = true; //data 로딩 상태
   Map<String, dynamic>? userData; // userData
 
+  @override
+  void initState() {
+    super.initState();
+    _firestore = _firebaseInit.firestore; // FirebaseFirestore 가져오기
+    userId = _firebaseInit.auth.currentUser?.uid ?? ''; //ID 가져오기
+    _dateManager = DateManager(
+      firestore: _firestore, // Firestore 인스턴스 전달
+      userId: userId); // 현재 로그인한 ID를 Date Manager에게 전달
+    _mealData = _initializeMealData();
+    _loadDataForDate(); // 초기 데이터 로드
+    _fetchDailyGoal(); // 초기화시 목표 영양값 가져오기
+  }
+
   // Firebase에서 currentWeight 가져와서 목표값 계산
   Future<void> _fetchDailyGoal() async {
     try {
-      final userDoc = await _firestore.collection('users').doc(userId).get();
+      final userDoc = await _firestore
+      .collection('users')
+      .doc(userId)
+      .get();
       if (userDoc.exists) {
         userData = userDoc.data() as Map<String, dynamic>;
         double currentWeight = userData!['currentWeight'];
@@ -122,22 +139,13 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   String _formattedDate() {
-    return "${_selectedDate.toLocal()}".split(' ')[0];
+    return _dateManager.formattedDate();
   }
 
   // Firestore에서 날짜별 데이터 불러오기
   Future<void> _loadDataForDate() async {
-    try {
-      final doc = await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('daily_data')
-          .doc(_formattedDate())
-          .get();
-
-      if (doc.exists) {
-        final data = doc.data()!;
-        setState(() {
+    _dateManager.loadDataForDate(onDataLoaded: (data){
+          setState(() {
           _calories = (data['calories'] ?? 0).toDouble();
           _carbs = (data['carbs'] ?? 0).toDouble();
           _proteins = (data['proteins'] ?? 0).toDouble();
@@ -145,36 +153,24 @@ class _MainScreenState extends State<MainScreen> {
           _mealData = Map<String, Map<String, dynamic>>.from(
               data['meals'] ?? _initializeMealData());
         });
-      } else {
-        _resetData();
-      }
-    } catch (e) {
-      debugPrint("Error loading data: $e");
-      _resetData();
-    }
+      },
+      onNoData: _resetData,
+    );
   }
 
   // Firestore에 데이터 저장
-  Future<void> _saveDataForDate() async {
-    final formattedDate = "${_selectedDate.toLocal()}".split(' ')[0];
-    try {
-      await _firestore
-          .collection('users')
-          .doc(userId)
-          .collection('daily_data')
-          .doc(formattedDate)
-          .set({
-        'calories': _calories,
-        'carbs': _carbs,
-        'proteins': _proteins,
-        'fats': _fats,
-        'meals': _mealData,
-      });
-      print("Data saved successfully!");
-    } catch (e) {
-      print("Error saving data: $e");
-    }
-  }
+  void _saveDataForDate() {
+  final data = {
+    'calories': _calories,
+    'carbs': _carbs,
+    'proteins': _proteins,
+    'fats': _fats,
+    'meals': _mealData,
+  };
+
+  _dateManager.saveDataForDate(data); // DateManager 사용
+}
+
 
   // 데이터 초기화
   void _resetData() {
@@ -189,27 +185,22 @@ class _MainScreenState extends State<MainScreen> {
 
   // 날짜 변경 함수
   void _changeDate(int days) {
-    setState(() {
-      _selectedDate = _selectedDate.add(Duration(days: days));
-    });
-    _loadDataForDate();
+    _dateManager.changeDate(
+      days,
+      (newDate) => setState(() {
+        _loadDataForDate();
+      }),
+    );
   }
 
   // 날짜 선택 함수
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+    await _dateManager.selectDate(
+      context,
+      onDateSelected: (newDate) => setState(() {
+        _loadDataForDate();
+      }),
     );
-
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-      _loadDataForDate();
-    }
   }
 
   // 식사 데이터를 표시하는 UI
@@ -572,13 +563,6 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _mealData = _initializeMealData();
-    _loadDataForDate(); // 초기 데이터 로드
-    _fetchDailyGoal(); // 초기화시 목표 영양값 가져오기
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -641,7 +625,7 @@ class _MainScreenState extends State<MainScreen> {
             _buildProgressBar("단백질", _proteins, dailyProteins),
             _buildProgressBar("지방", _fats, dailyFats),
             const SizedBox(height: 20),
-            ..._mealData.keys.map(buildMealRow),
+            ...["아침","점심","저녁"].map(buildMealRow),
           ],
         ),
       ),
@@ -650,15 +634,15 @@ class _MainScreenState extends State<MainScreen> {
 }
 
 class UserDataService {
-  final FirebaseFirestore firestore;
+  final _firestore;
 
-  UserDataService(this.firestore);
+  UserDataService(this._firestore);
 
   Future<Map<String, dynamic>?> fetchUserData(String userId) async {
     try {
       // Firestore에서 사용자 데이터 가져오기
       DocumentSnapshot userDoc =
-          await firestore.collection('users').doc(userId).get();
+          await _firestore.collection('users').doc(userId).get();
 
       if (userDoc.exists) {
         // 문서가 존재하면 데이터를 반환
