@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:dietary2/settings/myPage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,6 +7,28 @@ import '../data_mg/recomend_mg.dart';
 import 'package:dietary2/firebase_init.dart';
 import 'package:dietary2/data_mg/date_manager.dart';
 import 'package:dietary2/data_mg/goal_manager.dart';
+import '../data_mg/user_data_service.dart';
+
+// 초과된 부분을 자르는 클리퍼
+class _ExcessClipper extends CustomClipper<Rect> {
+  final double startRatio;
+  final double endRatio;
+
+  _ExcessClipper(this.startRatio, this.endRatio);
+
+  @override
+  Rect getClip(Size size) {
+    double start = size.width * startRatio;
+    double end = size.width * endRatio;
+    return Rect.fromLTRB(start, 0, end, size.height);
+  }
+
+  @override
+  bool shouldReclip(_ExcessClipper oldClipper) {
+    return startRatio != oldClipper.startRatio ||
+        endRatio != oldClipper.endRatio;
+  }
+}
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -20,6 +43,8 @@ class _MainScreenState extends State<MainScreen> {
   late String userId;
   late DateManager _dateManager;
   late GoalManager _goalManager;
+  late UserDataService _userDataService;
+  StreamSubscription<Map<String, dynamic>>? _userDataSubcription;
 
   bool isLoading = true; //data 로딩 상태
   Map<String, dynamic>? userData; // userData
@@ -29,12 +54,27 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
     _firestore = _firebaseInit.firestore; // FirebaseFirestore 가져오기
     userId = _firebaseInit.auth.currentUser?.uid ?? ''; //ID 가져오기
-    _dateManager = DateManager(
-        firestore: _firestore, // Firestore 인스턴스 전달
-        userId: userId); // 현재 로그인한 ID를 Date Manager에게 전달
+    _dateManager = DateManager(firestore: _firestore,userId: userId);
     _goalManager = GoalManager(firestore: _firestore, userId: userId);
+    _userDataService = UserDataService(_firestore);
+
+    _userDataSubcription = _userDataService
+      .userDataStream(userId)
+      .listen((userData) {
+        setState(() { // 사용자 정보 변경 시 목표값 업데이트
+          _fetchDailyGoal();
+        });
+      }, onError: (error) {
+        print("Error in user data stream : $error");
+      });
     _loadDataForDate(); // 초기 데이터 로드
-    _fetchDailyGoal(); // 초기화시 목표 영양값 가져오기
+    _fetchDailyGoal(); // 초기 목표 영양값 가져오기
+  }
+
+  @override
+  void dispose() { // 앱의 불필요한 작업 지속 방지
+    _userDataSubcription?.cancel(); // 스트림 구독 취소
+    super.dispose();
   }
 
   String _formattedDate() {
@@ -339,51 +379,5 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
     );
-  }
-}
-
-class UserDataService {
-  final _firestore;
-
-  UserDataService(this._firestore);
-
-  Future<Map<String, dynamic>?> fetchUserData(String userId) async {
-    try {
-      // Firestore에서 사용자 데이터 가져오기
-      DocumentSnapshot userDoc =
-          await _firestore.collection('users').doc(userId).get();
-
-      if (userDoc.exists) {
-        // 문서가 존재하면 데이터를 반환
-        return userDoc.data() as Map<String, dynamic>;
-      } else {
-        print('User data not found!');
-        return null;
-      }
-    } catch (e) {
-      print('Error fetching user data: $e');
-      return null;
-    }
-  }
-}
-
-// 초과된 부분을 자르는 클리퍼
-class _ExcessClipper extends CustomClipper<Rect> {
-  final double startRatio;
-  final double endRatio;
-
-  _ExcessClipper(this.startRatio, this.endRatio);
-
-  @override
-  Rect getClip(Size size) {
-    double start = size.width * startRatio;
-    double end = size.width * endRatio;
-    return Rect.fromLTRB(start, 0, end, size.height);
-  }
-
-  @override
-  bool shouldReclip(_ExcessClipper oldClipper) {
-    return startRatio != oldClipper.startRatio ||
-        endRatio != oldClipper.endRatio;
   }
 }
