@@ -13,7 +13,7 @@ class CommunityService {
   /// Firestore에 게시글 추가
   Future<void> addPost({
     required String title,
-    required String date, // 'date'는 수정된 부분
+    required String date,
     String? comment,
     File? imageFile,
   }) async {
@@ -41,36 +41,48 @@ class CommunityService {
     }
 
     // Firestore에서 사용자의 이름을 가져오기
-    print(user.uid);
-    final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
     if (userDoc.exists) {
       authorName = userDoc['name'];
     } else {
       throw ArgumentError('사용자 정보가 존재하지 않습니다.');
     }
 
-    // 날짜를 포맷팅 (예: 2024-12-06)
+    // 날짜를 포맷팅
     String formattedDate = _formatDate(DateTime.now());
 
     // Firestore에 데이터 저장
     await _collection.add({
       'title': title,
       'author': authorName,
-      'date': formattedDate, // 포맷된 날짜 저장
+      'date': formattedDate,
       'comment': comment,
       'image_url': imageUrl ?? '',
     });
   }
 
+  /// Firestore에서 게시글 삭제
+  Future<void> deletePost(String postId) async {
+    try {
+      await _collection.doc(postId).delete();
+    } catch (e) {
+      throw Exception("게시글 삭제에 실패했습니다.");
+    }
+  }
+
   /// 날짜 포맷팅 함수
   String _formatDate(DateTime dateTime) {
-    final DateFormat formatter = DateFormat('yyyy-MM-dd'); // 원하는 형식으로 포맷
-    return formatter.format(dateTime); // 날짜를 포맷하여 반환
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    return formatter.format(dateTime);
   }
 
   /// 갤러리에서 이미지를 선택하는 메서드
   Future<File?> pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       return File(pickedFile.path);
     }
@@ -79,9 +91,13 @@ class CommunityService {
 
   /// Firestore에서 실시간으로 데이터를 가져오는 Stream
   Stream<List<Map<String, dynamic>>> getPosts() {
-    return _collection.snapshots().map((snapshot) {
+    return _collection
+        .orderBy('date', descending: true) // 작성 날짜 기준 내림차순 정렬
+        .snapshots()
+        .map((snapshot) {
       return snapshot.docs.map((doc) {
         return {
+          'id': doc.id, // 게시글 ID 추가
           'title': doc['title'] ?? '제목 없음',
           'author': doc['author'] ?? '작성자 없음',
           'date': doc['date'] ?? '날짜 없음',

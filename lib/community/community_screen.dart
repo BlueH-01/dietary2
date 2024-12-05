@@ -17,8 +17,8 @@ class CommunityScreen extends StatelessWidget {
           '다이어터 커뮤니티',
           style: TextStyle(fontSize: 16, color: Colors.grey),
         ),
-        centerTitle: true, // 제목을 가운데 정렬
-        automaticallyImplyLeading: false, // 뒤로가기 버튼 제거
+        centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _communityService.getPosts(),
@@ -59,8 +59,15 @@ class CommunityScreen extends StatelessWidget {
                       ? Image.network(post['image_url'],
                           width: 50, height: 50, fit: BoxFit.cover)
                       : null,
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () async {
+                      final postId = post['id']; // 게시글 ID를 받아서 삭제
+                      await _communityService.deletePost(postId);
+                    },
+                  ),
                   onTap: () {
-                    // 게시글 상세보기 화면으로 이동
+                    final postId = post['id']; // 게시글 ID
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -70,6 +77,7 @@ class CommunityScreen extends StatelessWidget {
                           date: post['date'],
                           comment: post['comment'],
                           imageUrl: post['image_url'],
+                          postId: postId, // postId를 전달
                         ),
                       ),
                     );
@@ -87,7 +95,7 @@ class CommunityScreen extends StatelessWidget {
             MaterialPageRoute(builder: (context) => const AddPostScreen()),
           );
         },
-        child: const Icon(Icons.edit), // 연필 아이콘으로 변경
+        child: const Icon(Icons.edit),
       ),
     );
   }
