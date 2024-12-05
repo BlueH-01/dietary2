@@ -31,14 +31,18 @@ class _MainScreenState extends State<MainScreen> {
 
   StreamSubscription<Map<String, dynamic>>? _userDataSubcription;
 
-  bool isLoading = true; //data 로딩 상태
+  bool isLoading = true; // data 로딩 상태
   Map<String, dynamic>? userData; // userData
+
+  // PageController 추가
+  late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: 1); // 초기 페이지를 두 번째로 설정
     _firestore = _firebaseInit.firestore; // FirebaseFirestore 가져오기
-    userId = _firebaseInit.auth.currentUser?.uid ?? ''; //ID 가져오기
+    userId = _firebaseInit.auth.currentUser?.uid ?? ''; // ID 가져오기
     _dateManager = DateManager(firestore: _firestore, userId: userId);
     _nutritionManager = _dateManager.nutritionManager;
     _goalManager = GoalManager(firestore: _firestore, userId: userId);
@@ -53,8 +57,8 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   void dispose() {
-    // 앱의 불필요한 작업 지속 방지
     _userDataSubcription?.cancel(); // 스트림 구독 취소
+    _pageController.dispose(); // PageController 해제
     super.dispose();
   }
 
@@ -185,7 +189,9 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       body: PageView(
+        controller: _pageController,
         children: [
+          const WeightRecordScreen(), // 몸무게 기록 화면 (왼쪽)
           SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -246,8 +252,7 @@ class _MainScreenState extends State<MainScreen> {
               ],
             ),
           ),
-          const WeightRecordScreen(), // PageView에 WeightRecordScreen 추가
-          CommunityScreen(),
+          CommunityScreen(), // 커뮤니티 화면 (오른쪽)
         ],
       ),
     );

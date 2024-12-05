@@ -4,6 +4,8 @@ import 'community_service.dart';
 import 'package:intl/intl.dart'; // intl 패키지 추가
 
 class AddPostScreen extends StatefulWidget {
+  const AddPostScreen({super.key});
+
   @override
   _AddPostScreenState createState() => _AddPostScreenState();
 }
@@ -24,22 +26,22 @@ class _AddPostScreenState extends State<AddPostScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('게시글 작성'),
+        title: const Text('게시글 작성'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               controller: _titleController,
-              decoration: InputDecoration(labelText: '제목'),
+              decoration: const InputDecoration(labelText: '제목'),
             ),
             TextField(
               controller: _commentController,
-              decoration: InputDecoration(labelText: '내용'),
+              decoration: const InputDecoration(labelText: '내용'),
               maxLines: 4,
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             GestureDetector(
               onTap: () async {
                 _imageFile = await _communityService.pickImage();
@@ -50,15 +52,16 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 color: Colors.grey[200],
                 child: _imageFile != null
                     ? Image.file(_imageFile!, fit: BoxFit.cover)
-                    : Center(child: Text('이미지 추가')),
+                    : const Center(child: Text('이미지 추가')),
               ),
             ),
-            Spacer(),
+            const Spacer(),
             ElevatedButton(
               onPressed: () async {
-                if (_titleController.text.isEmpty || _commentController.text.isEmpty) {
+                if (_titleController.text.isEmpty ||
+                    _commentController.text.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('제목과 내용을 입력해주세요.')),
+                    const SnackBar(content: Text('제목과 내용을 입력해주세요.')),
                   );
                 } else {
                   try {
@@ -67,7 +70,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
                     await _communityService.addPost(
                       title: _titleController.text,
-                      author: '사용자 이름', // 임시로 사용자 이름 설정
+
                       date: formattedTime, // 포맷된 시간 저장
                       comment: _commentController.text,
                       imageFile: _imageFile,
@@ -80,7 +83,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                   }
                 }
               },
-              child: Text('게시글 작성'),
+              child: const Text('게시글 작성'),
             ),
           ],
         ),

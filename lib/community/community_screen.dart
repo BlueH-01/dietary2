@@ -1,4 +1,3 @@
-// community_screen.dart
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import './community_service.dart';
@@ -8,21 +7,28 @@ import './post_detail_screen.dart'; // 추가한 상세보기 화면 import
 class CommunityScreen extends StatelessWidget {
   final CommunityService _communityService = CommunityService();
 
+  CommunityScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('게시판'),
+        title: const Text(
+          '다이어터 커뮤니티',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+        centerTitle: true, // 제목을 가운데 정렬
+        automaticallyImplyLeading: false, // 뒤로가기 버튼 제거
       ),
-      body: StreamBuilder<List<Map<String, dynamic>>>( 
+      body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _communityService.getPosts(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('게시글이 없습니다.'));
+            return const Center(child: Text('게시글이 없습니다.'));
           }
 
           final posts = snapshot.data!;
@@ -31,16 +37,17 @@ class CommunityScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final post = posts[index];
               return Card(
-                margin: EdgeInsets.all(8.0),
+                margin: const EdgeInsets.all(8.0),
                 elevation: 4,
                 child: ListTile(
-                  title: Text(post['title'], style: TextStyle(fontWeight: FontWeight.bold)),
+                  title: Text(post['title'],
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('작성자: ${post['author']}'),
                       Text('작성 날짜: ${post['date']}'),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         post['comment'],
                         maxLines: 2,
@@ -49,7 +56,8 @@ class CommunityScreen extends StatelessWidget {
                     ],
                   ),
                   leading: post['image_url'].isNotEmpty
-                      ? Image.network(post['image_url'], width: 50, height: 50, fit: BoxFit.cover)
+                      ? Image.network(post['image_url'],
+                          width: 50, height: 50, fit: BoxFit.cover)
                       : null,
                   onTap: () {
                     // 게시글 상세보기 화면으로 이동
@@ -76,10 +84,10 @@ class CommunityScreen extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddPostScreen()),
+            MaterialPageRoute(builder: (context) => const AddPostScreen()),
           );
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.edit), // 연필 아이콘으로 변경
       ),
     );
   }
