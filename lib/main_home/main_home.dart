@@ -37,11 +37,13 @@ class _MainScreenState extends State<MainScreen> {
 
   // PageController 추가
   late PageController _pageController;
+  int _currentPageIndex = 1; // 초기 페이지 인덱스 설정
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: 1); // 초기 페이지를 두 번째로 설정
+    _pageController =
+        PageController(initialPage: _currentPageIndex); // 초기 페이지를 두 번째로 설정
     _firestore = _firebaseInit.firestore; // FirebaseFirestore 가져오기
     userId = _firebaseInit.auth.currentUser?.uid ?? ''; // ID 가져오기
     _dateManager = DateManager(firestore: _firestore, userId: userId);
@@ -61,6 +63,25 @@ class _MainScreenState extends State<MainScreen> {
     _userDataSubcription?.cancel(); // 스트림 구독 취소
     _pageController.dispose(); // PageController 해제
     super.dispose();
+  }
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentPageIndex = index; // 현재 페이지 인덱스 업데이트
+    });
+  }
+
+  String _getAppBarTitle() {
+    switch (_currentPageIndex) {
+      case 0:
+        return "체중 기록";
+      case 1:
+        return "영양 관리";
+      case 2:
+        return "커뮤니티";
+      default:
+        return "Dietary";
+    }
   }
 
   void _handleExcessTap(String nutrient) {
@@ -103,7 +124,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-    // Custom Calendar 이동
+  // Custom Calendar 이동
   Future<void> _openCustomCalendar(BuildContext context) async {
     await Navigator.push(
       context,
@@ -167,16 +188,15 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Dietary",
-          style: TextStyle(
+        title: Text(
+          _getAppBarTitle(),
+          style: const TextStyle(
               fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 132, 195, 135),
         actions: [
           IconButton(
-            // 설정 버튼
             onPressed: () {
               Navigator.push(
                 context,
@@ -197,6 +217,7 @@ class _MainScreenState extends State<MainScreen> {
       ),
       body: PageView(
         controller: _pageController,
+        onPageChanged: _onPageChanged,
         children: [
           const WeightRecordScreen(), // 몸무게 기록 화면 (왼쪽)
           SingleChildScrollView(

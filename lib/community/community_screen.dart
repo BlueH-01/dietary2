@@ -12,14 +12,6 @@ class CommunityScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          '다이어터 커뮤니티',
-          style: TextStyle(fontSize: 16, color: Colors.grey),
-        ),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-      ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _communityService.getPosts(),
         builder: (context, snapshot) {
@@ -32,8 +24,10 @@ class CommunityScreen extends StatelessWidget {
           }
 
           final posts = snapshot.data!;
+
           return ListView.builder(
             itemCount: posts.length,
+            padding: const EdgeInsets.only(bottom: 100.0), // 아래에 충분한 여백 추가
             itemBuilder: (context, index) {
               final post = posts[index];
               return Card(
@@ -60,7 +54,7 @@ class CommunityScreen extends StatelessWidget {
                           width: 50, height: 50, fit: BoxFit.cover)
                       : null,
                   trailing: IconButton(
-                    icon: const Icon(Icons.delete),
+                    icon: const Icon(Icons.delete, color: Colors.grey),
                     onPressed: () async {
                       final postId = post['id']; // 게시글 ID를 받아서 삭제
                       await _communityService.deletePost(postId);
