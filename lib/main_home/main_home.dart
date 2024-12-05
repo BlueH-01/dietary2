@@ -9,27 +9,7 @@ import 'package:dietary2/firebase_init.dart';
 import 'package:dietary2/data_mg/date_manager.dart';
 import 'package:dietary2/data_mg/goal_manager.dart';
 import '../data_mg/user_data_service.dart';
-
-// 초과된 부분을 자르는 클리퍼
-class _ExcessClipper extends CustomClipper<Rect> {
-  final double startRatio;
-  final double endRatio;
-
-  _ExcessClipper(this.startRatio, this.endRatio);
-
-  @override
-  Rect getClip(Size size) {
-    double start = size.width * startRatio;
-    double end = size.width * endRatio;
-    return Rect.fromLTRB(start, 0, end, size.height);
-  }
-
-  @override
-  bool shouldReclip(_ExcessClipper oldClipper) {
-    return startRatio != oldClipper.startRatio ||
-        endRatio != oldClipper.endRatio;
-  }
-}
+import '../data_mg/ui_manager.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -46,6 +26,7 @@ class _MainScreenState extends State<MainScreen> {
   late NutritionManager _nutritionManager;
   late GoalManager _goalManager;
   late UserDataService _userDataService;
+  
   StreamSubscription<Map<String, dynamic>>? _userDataSubcription;
 
   bool isLoading = true; //data 로딩 상태
@@ -162,66 +143,6 @@ class _MainScreenState extends State<MainScreen> {
         onError: () {});
   }
 
-  // 식사 데이터를 표시하는 UI
-  Widget _buildProgressBar(String label, double currentValue, double goal) {
-    double maxValue = goal * 1.3; // 최대치: goal의 130%
-    double progress = currentValue / maxValue; // 전체 막대의 진행률
-    double normalProgress =
-        (currentValue > goal ? goal : currentValue) / maxValue; // 정상 범위 진행률
-    double excessProgress =
-        (currentValue > goal ? currentValue - goal : 0) / maxValue; // 초과 범위 진행률
-
-    return GestureDetector(
-      onTap: () {
-        if (currentValue > goal) {
-          _showRecommendationDialog(label, currentValue - goal);
-        }
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label),
-          Stack(
-            children: [
-              // 기본 회색 배경 (전체 Progress Bar)
-              LinearProgressIndicator(
-                value: 1.0,
-                backgroundColor: Colors.grey[300],
-                valueColor: const AlwaysStoppedAnimation<Color>(
-                  Colors.grey, // 기본 회색
-                ),
-                minHeight: 8.0,
-              ),
-              // 초록색 정상 범위 Progress Bar
-              LinearProgressIndicator(
-                value: normalProgress,
-                backgroundColor: Colors.transparent,
-                valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color.fromARGB(255, 118, 193, 120), // 초록색
-                ),
-                minHeight: 8.0,
-              ),
-              // 빨간색 초과 범위 Progress Bar
-              if (currentValue > goal)
-                ClipRect(
-                  clipper: _ExcessClipper(normalProgress, progress),
-                  child: const LinearProgressIndicator(
-                    value: 1.0,
-                    backgroundColor: Colors.transparent,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.red, // 초과된 부분 빨간색
-                    ),
-                    minHeight: 8.0,
-                  ),
-                ),
-            ],
-          ),
-          Text("${currentValue.toInt()} / ${goal.toInt()}"),
-        ],
-      ),
-    );
-  }
-
   void _showRecommendationDialog(String nutrient, double excessAmount) {
     // recommend.dart에서 데이터 가져오기
     final suggestions = getRecommendations(nutrient);
@@ -276,37 +197,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  // 식사 데이터를 표시하는 UI2
-  Widget buildMealRow(String mealTime) {
-    final meal = _nutritionManager.mealData[mealTime]!;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Card(
-        elevation: 4.0, // 그림자 효과
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        child: ListTile(
-          contentPadding: const EdgeInsets.all(16.0),
-          title: Text(
-            "$mealTime: ${meal['name']}",
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          subtitle: Text(
-            "${meal['calories']} kcal",
-            style: const TextStyle(fontSize: 12),
-          ),
-          trailing: IconButton(
-            onPressed: () => openFoodSelectionScreen(mealTime),
-            icon: const Icon(Icons.edit,
-                color: Color.fromARGB(255, 132, 195, 135)),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -362,12 +253,46 @@ class _MainScreenState extends State<MainScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            _buildProgressBar("칼로리", _dateManager.calories, _goalManager.dailyCalories),
-            _buildProgressBar("탄수화물", _dateManager.carbs, _goalManager.dailyCarbs),
-            _buildProgressBar("단백질", _dateManager.proteins, _goalManager.dailyProteins),
-            _buildProgressBar("지방", _dateManager.fats, _goalManager.dailyFats),
+            UIManager.buildProgressBar(
+              label: "칼로리",
+              currentValue: _dateManager.calories,
+              goal: _goalManager.dailyCalories,
+              onExcessTap: () {
+                _showRecommendationDialog("칼로리", _dateManager.calories - _goalManager.dailyCalories);
+              },
+            ),
+            UIManager.buildProgressBar(
+              label: "탄수화물",
+              currentValue: _dateManager.carbs,
+              goal: _goalManager.dailyCarbs,
+              onExcessTap: () {
+                _showRecommendationDialog("탄수화물", _dateManager.carbs - _goalManager.dailyCarbs);
+              },
+            ),
+            UIManager.buildProgressBar(
+              label: "단백질",
+              currentValue: _dateManager.proteins,
+              goal: _goalManager.dailyProteins,
+              onExcessTap: () {
+                _showRecommendationDialog("단백질", _dateManager.proteins - _goalManager.dailyProteins);
+              },
+            ),
+            UIManager.buildProgressBar(
+              label: "지방",
+              currentValue: _dateManager.fats,
+              goal: _goalManager.dailyFats,
+              onExcessTap: () {
+                _showRecommendationDialog("지방", _dateManager.fats - _goalManager.dailyFats);
+              },
+            ),
             const SizedBox(height: 20),
-            ...["아침", "점심", "저녁", "간식"].map(buildMealRow),
+            ...["아침", "점심", "저녁", "간식"].map((mealTime) {
+              return UIManager.buildMealRow(
+                meal: _nutritionManager.mealData[mealTime]!,
+                mealTime: mealTime,
+                onEdit: () => openFoodSelectionScreen(mealTime),
+              );
+            }),
           ],
         ),
       ),
