@@ -10,6 +10,7 @@ import 'package:dietary2/data_mg/date_manager.dart';
 import 'package:dietary2/data_mg/goal_manager.dart';
 import '../data_mg/user_data_service.dart';
 import '../data_mg/ui_manager.dart';
+import './custom_calendar.dart';
 import './weight_record.dart';
 import '../community/community_screen.dart';
 
@@ -102,14 +103,20 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  // 날짜 선택 함수
-  Future<void> _selectDate(BuildContext context) async {
-    await _dateManager.selectDate(
+    // Custom Calendar 이동
+  Future<void> _openCustomCalendar(BuildContext context) async {
+    await Navigator.push(
       context,
-      onDateSelected: (newDate) => setState(() {
-        _loadDataForDate();
-      }),
+      MaterialPageRoute(
+        builder: (context) => CustomCalendar(
+          dateManager: _dateManager,
+          goalManager: _goalManager,
+        ),
+      ),
     );
+    setState(() {
+      _loadDataForDate();
+    });
   }
 
   // 음식 선택 화면으로 이동
@@ -211,7 +218,7 @@ class _MainScreenState extends State<MainScreen> {
                       icon: const Icon(Icons.arrow_right),
                     ),
                     IconButton(
-                      onPressed: () => _selectDate(context),
+                      onPressed: () => _openCustomCalendar(context),
                       icon: const Icon(Icons.calendar_today),
                     ),
                   ],
