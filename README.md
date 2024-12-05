@@ -1,16 +1,50 @@
-# dietary2
+# Dietary
 
-A new Flutter project.
+**Dietary**는 사용자가 건강한 생활을 유지할 수 있도록 식단과 체중을 기록하고 관리하는 애플리케이션입니다. 사용자가 입력한 데이터에 따라 영양소 상태를 시각적으로 확인할 수 있으며, 체중 변화와 단식 시간을 기록해 더 나은 건강 목표를 달성할 수 있도록 돕습니다.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 주요 기능
 
-A few resources to get you started if this is your first Flutter project:
+### 1. **메인 홈**
+- **날짜별 체중 변화 기록**: 오른쪽에서 왼쪽으로 드래그하여 날짜별로 체중을 입력하고 그래프로 확인할 수 있는 페이지를 제공합니다.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 2. **프로필 관리**
+- **프로필 사진 변경**: 갤러리에서 프로필 사진을 선택해 변경할 수 있습니다. 현재 시연 영상에서는 사진 변경만 가능합니다.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 3. **회원가입 및 로그인**
+- **회원가입**:
+  - 사용자 이름, 생년월일, 이메일 아이디, 비밀번호를 입력받아 회원가입.
+  - 이메일 아이디는 고유 식별자로 사용됩니다.
+  - 비밀번호는 최소 6자리 이상 입력해야 합니다.
+- **로그인**:
+  - 아이디(이메일)와 비밀번호를 입력하여 로그인합니다.
+
+### 4. **사용자 정보 입력**
+- **정보 입력**:
+  - 키, 나이, 몸무게, 성별 입력 (음수 값 허용하지 않음).
+  - 목표 체중 입력 가능.
+
+### 5. **식단 기록 및 관리**
+- **식단 입력**:
+  - 아침, 점심, 저녁, 간식으로 구분하여 섭취한 음식을 기록.
+  - 음식 목록에서 선택하거나 직접 입력.
+- **영양소 관리**:
+  - 입력한 음식의 칼로리, 탄수화물, 단백질 정보를 저장.
+  - 자주 먹는 음식은 즐겨찾기로 등록 가능.
+  - 날짜별 섭취한 영양소를 그래프로 시각화.
+  - 섭취한 영양소가 초과하면 그래프에 **빨간색**으로 표시.
+
+### 6. **알림 기능**
+- 식사 시간(아침, 점심, 저녁)에 맞춰 알림 설정 가능.
+- 단식 시간 기록:
+  - 단식 시작과 종료 시 알림 제공.
+
+---
+
+## 설치 및 실행
+
+### 설치 방법
+1. 저장소를 클론합니다:
+   ```bash
+ 
