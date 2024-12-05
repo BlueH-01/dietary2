@@ -55,6 +55,14 @@ class _MainScreenState extends State<MainScreen> {
     super.dispose();
   }
 
+  void _handleExcessTap(String nutrient) {
+    UIManager.showRecommendationDialog(
+      context: context,
+      nutrient: nutrient,
+      suggestions: getRecommendations(nutrient),
+    );
+  }
+
   String _formattedDate() {
     return _dateManager.formattedDate();
   }
@@ -143,60 +151,6 @@ class _MainScreenState extends State<MainScreen> {
         onError: () {});
   }
 
-  void _showRecommendationDialog(String nutrient, double excessAmount) {
-    // recommend.dart에서 데이터 가져오기
-    final suggestions = getRecommendations(nutrient);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            "$nutrient 초과 해결 방법",
-            style: const TextStyle(
-              color: Color.fromARGB(255, 132, 195, 135),
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          content: SizedBox(
-            width: 400,
-            height: 370,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox(height: 20),
-                  ...suggestions.map(
-                    (suggestion) => ListTile(
-                      leading: Icon(
-                        suggestion['icon'],
-                        color: suggestion['type'] == '운동'
-                            ? Colors.blue
-                            : Colors.green,
-                      ),
-                      title: Text(
-                        suggestion['suggestion'],
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("닫기", style: TextStyle(color: Colors.green)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
    @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -257,33 +211,25 @@ class _MainScreenState extends State<MainScreen> {
               label: "칼로리",
               currentValue: _dateManager.calories,
               goal: _goalManager.dailyCalories,
-              onExcessTap: () {
-                _showRecommendationDialog("칼로리", _dateManager.calories - _goalManager.dailyCalories);
-              },
+              onExcessTap: () => _handleExcessTap("칼로리"),
             ),
             UIManager.buildProgressBar(
               label: "탄수화물",
               currentValue: _dateManager.carbs,
               goal: _goalManager.dailyCarbs,
-              onExcessTap: () {
-                _showRecommendationDialog("탄수화물", _dateManager.carbs - _goalManager.dailyCarbs);
-              },
+              onExcessTap: () => _handleExcessTap("탄수화물"),
             ),
             UIManager.buildProgressBar(
               label: "단백질",
               currentValue: _dateManager.proteins,
               goal: _goalManager.dailyProteins,
-              onExcessTap: () {
-                _showRecommendationDialog("단백질", _dateManager.proteins - _goalManager.dailyProteins);
-              },
+              onExcessTap: () => _handleExcessTap("단백질"),
             ),
             UIManager.buildProgressBar(
               label: "지방",
               currentValue: _dateManager.fats,
               goal: _goalManager.dailyFats,
-              onExcessTap: () {
-                _showRecommendationDialog("지방", _dateManager.fats - _goalManager.dailyFats);
-              },
+              onExcessTap: () => _handleExcessTap("지방"),
             ),
             const SizedBox(height: 20),
             ...["아침", "점심", "저녁", "간식"].map((mealTime) {
