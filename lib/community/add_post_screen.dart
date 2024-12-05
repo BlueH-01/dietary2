@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'community_service.dart';
-import 'package:intl/intl.dart'; // intl 패키지 추가
+import 'package:intl/intl.dart';
 
 class AddPostScreen extends StatefulWidget {
   const AddPostScreen({super.key});
@@ -18,30 +18,95 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   /// 날짜 포맷팅 함수
   String _formatTime(DateTime dateTime) {
-    final DateFormat formatter = DateFormat('HH:mm'); // '시간:분' 형식으로 포맷
-    return formatter.format(dateTime); // 포맷된 시간 반환
+    final DateFormat formatter = DateFormat('HH:mm');
+    return formatter.format(dateTime);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('게시글 작성'),
+        title: const Text(
+          "게시글 작성",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: const Color.fromARGB(255, 132, 195, 135),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(20),
+          ),
+        ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              "제목",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(labelText: '제목'),
+              decoration: InputDecoration(
+                hintText: '게시글의 제목을 입력하세요',
+                hintStyle: TextStyle(
+                  color: Colors.black.withOpacity(0.5),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.grey),
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+              ),
             ),
+            const SizedBox(height: 20),
+            const Text(
+              "내용",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
             TextField(
               controller: _commentController,
-              decoration: const InputDecoration(labelText: '내용'),
-              maxLines: 4,
+              decoration: InputDecoration(
+                hintText: '게시글의 내용을 입력하세요',
+                hintStyle: TextStyle(
+                  color: Colors.black.withOpacity(0.5),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.grey),
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+              ),
+              maxLines: 5,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             GestureDetector(
               onTap: () async {
                 _imageFile = await _communityService.pickImage();
@@ -49,41 +114,70 @@ class _AddPostScreenState extends State<AddPostScreen> {
               },
               child: Container(
                 height: 150,
-                color: Colors.grey[200],
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey),
+                ),
                 child: _imageFile != null
-                    ? Image.file(_imageFile!, fit: BoxFit.cover)
-                    : const Center(child: Text('이미지 추가')),
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(
+                          _imageFile!,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        ),
+                      )
+                    : const Center(
+                        child: Text(
+                          '이미지 추가 (탭하세요)',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ),
               ),
             ),
-            const Spacer(),
-            ElevatedButton(
-              onPressed: () async {
-                if (_titleController.text.isEmpty ||
-                    _commentController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('제목과 내용을 입력해주세요.')),
-                  );
-                } else {
-                  try {
-                    // 시간만 포맷한 date
-                    String formattedTime = _formatTime(DateTime.now());
-
-                    await _communityService.addPost(
-                      title: _titleController.text,
-
-                      date: formattedTime, // 포맷된 시간 저장
-                      comment: _commentController.text,
-                      imageFile: _imageFile,
-                    );
-                    Navigator.pop(context);
-                  } catch (e) {
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () async {
+                  if (_titleController.text.isEmpty ||
+                      _commentController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('오류가 발생했습니다: $e')),
+                      const SnackBar(content: Text('제목과 내용을 입력해주세요.')),
                     );
+                  } else {
+                    try {
+                      String formattedTime = _formatTime(DateTime.now());
+                      await _communityService.addPost(
+                        title: _titleController.text,
+                        date: formattedTime,
+                        comment: _commentController.text,
+                        imageFile: _imageFile,
+                      );
+                      Navigator.pop(context);
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('오류가 발생했습니다: $e')),
+                      );
+                    }
                   }
-                }
-              },
-              child: const Text('게시글 작성'),
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  backgroundColor: const Color.fromARGB(255, 132, 195, 135),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  '게시글 작성',
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              ),
             ),
           ],
         ),
