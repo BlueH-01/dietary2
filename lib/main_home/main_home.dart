@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dietary2/data_mg/nutrition_manager.dart';
 import 'package:dietary2/settings/myPage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -42,6 +43,7 @@ class _MainScreenState extends State<MainScreen> {
   late FirebaseFirestore _firestore = _firebaseInit.firestore;
   late String userId;
   late DateManager _dateManager;
+  late NutritionManager _nutritionManager;
   late GoalManager _goalManager;
   late UserDataService _userDataService;
   StreamSubscription<Map<String, dynamic>>? _userDataSubcription;
@@ -55,18 +57,13 @@ class _MainScreenState extends State<MainScreen> {
     _firestore = _firebaseInit.firestore; // FirebaseFirestore 가져오기
     userId = _firebaseInit.auth.currentUser?.uid ?? ''; //ID 가져오기
     _dateManager = DateManager(firestore: _firestore,userId: userId);
+    _nutritionManager = _dateManager.nutritionManager;
     _goalManager = GoalManager(firestore: _firestore, userId: userId);
     _userDataService = UserDataService(_firestore);
-
-    _userDataSubcription = _userDataService
-      .userDataStream(userId)
-      .listen((userData) {
-        setState(() { // 사용자 정보 변경 시 목표값 업데이트
-          _fetchDailyGoal();
-        });
-      }, onError: (error) {
-        print("Error in user data stream : $error");
-      });
+    
+    _userDataService.userDataStream(userId).listen((userData){
+      _fetchDailyGoal(); // 목표값 업데이트
+    });
     _loadDataForDate(); // 초기 데이터 로드
     _fetchDailyGoal(); // 초기 목표 영양값 가져오기
   }
@@ -86,14 +83,12 @@ class _MainScreenState extends State<MainScreen> {
     _dateManager.loadDataForDate(
       onDataLoaded: (data) {
         setState(() {
-          _dateManager
-          .nutritionManager.updateTotalData();
+          _nutritionManager.updateTotalData();
         });
       },
       onNoData: () {
         setState(() {
-          _dateManager
-          .nutritionManager.resetData();
+          _nutritionManager.resetData();
         });
       }
     );
@@ -135,16 +130,14 @@ class _MainScreenState extends State<MainScreen> {
 
     if (result != null && result is Map<String, dynamic>) {
       setState(() {
-        _dateManager
-        .nutritionManager.mealData[mealTime] = {
+        _nutritionManager.mealData[mealTime] = {
           "name": result['name'],
           "calories": result['calories'],
           "carbs": result['carbs'],
           "proteins": result['protein'],
           "fats": result['fat'],
         };
-        _dateManager
-        .nutritionManager.updateTotalData();
+        _nutritionManager.updateTotalData();
         _saveDataForDate(); // 저장
       });
     }
@@ -285,7 +278,7 @@ class _MainScreenState extends State<MainScreen> {
 
   // 식사 데이터를 표시하는 UI2
   Widget buildMealRow(String mealTime) {
-    final meal = _dateManager.nutritionManager.mealData[mealTime]!;
+    final meal = _nutritionManager.mealData[mealTime]!;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Card(
