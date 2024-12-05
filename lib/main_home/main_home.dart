@@ -11,6 +11,7 @@ import 'package:dietary2/data_mg/goal_manager.dart';
 import '../data_mg/user_data_service.dart';
 import '../data_mg/ui_manager.dart';
 import './weight_record.dart';
+import '../community/community_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -246,6 +247,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
           const WeightRecordScreen(), // PageView에 WeightRecordScreen 추가
+          CommunityScreen(),
         ],
       ),
     );
