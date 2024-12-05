@@ -10,6 +10,7 @@ import 'package:dietary2/data_mg/date_manager.dart';
 import 'package:dietary2/data_mg/goal_manager.dart';
 import '../data_mg/user_data_service.dart';
 import '../data_mg/ui_manager.dart';
+import './weight_record.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -26,7 +27,7 @@ class _MainScreenState extends State<MainScreen> {
   late NutritionManager _nutritionManager;
   late GoalManager _goalManager;
   late UserDataService _userDataService;
-  
+
   StreamSubscription<Map<String, dynamic>>? _userDataSubcription;
 
   bool isLoading = true; //data 로딩 상태
@@ -37,12 +38,12 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
     _firestore = _firebaseInit.firestore; // FirebaseFirestore 가져오기
     userId = _firebaseInit.auth.currentUser?.uid ?? ''; //ID 가져오기
-    _dateManager = DateManager(firestore: _firestore,userId: userId);
+    _dateManager = DateManager(firestore: _firestore, userId: userId);
     _nutritionManager = _dateManager.nutritionManager;
     _goalManager = GoalManager(firestore: _firestore, userId: userId);
     _userDataService = UserDataService(_firestore);
-    
-    _userDataService.userDataStream(userId).listen((userData){
+
+    _userDataService.userDataStream(userId).listen((userData) {
       _fetchDailyGoal(); // 목표값 업데이트
     });
     _loadDataForDate(); // 초기 데이터 로드
@@ -50,7 +51,8 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   @override
-  void dispose() { // 앱의 불필요한 작업 지속 방지
+  void dispose() {
+    // 앱의 불필요한 작업 지속 방지
     _userDataSubcription?.cancel(); // 스트림 구독 취소
     super.dispose();
   }
@@ -69,18 +71,15 @@ class _MainScreenState extends State<MainScreen> {
 
   // Firestore에서 날짜별 데이터 불러오기
   Future<void> _loadDataForDate() async {
-    _dateManager.loadDataForDate(
-      onDataLoaded: (data) {
-        setState(() {
-          _nutritionManager.updateTotalData();
-        });
-      },
-      onNoData: () {
-        setState(() {
-          _nutritionManager.resetData();
-        });
-      }
-    );
+    _dateManager.loadDataForDate(onDataLoaded: (data) {
+      setState(() {
+        _nutritionManager.updateTotalData();
+      });
+    }, onNoData: () {
+      setState(() {
+        _nutritionManager.resetData();
+      });
+    });
   }
 
   // Firestore에 데이터 저장
@@ -108,7 +107,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-    //음식 선택 화면으로 이동
+  // 음식 선택 화면으로 이동
   Future<void> openFoodSelectionScreen(String mealTime) async {
     final result = await Navigator.push(
       context,
@@ -132,26 +131,27 @@ class _MainScreenState extends State<MainScreen> {
     }
   }
 
-    // Firebase에서 currentWeight 가져와서 목표값 계산
+  // Firebase에서 currentWeight 가져와서 목표값 계산
   Future<void> _fetchDailyGoal() async {
     _goalManager.fetchDailyGoal(
-        onUpdate: ({
-          required double dailyCalories,
-          required double dailyCarbs,
-          required double dailyProteins,
-          required double dailyFats,
-        }) {
-          setState(() {
-            _goalManager.dailyCalories = dailyCalories;
-            _goalManager.dailyCarbs = dailyCarbs;
-            _goalManager.dailyProteins = dailyProteins;
-            _goalManager.dailyFats = dailyFats;
-          });
-        },
-        onError: () {});
+      onUpdate: ({
+        required double dailyCalories,
+        required double dailyCarbs,
+        required double dailyProteins,
+        required double dailyFats,
+      }) {
+        setState(() {
+          _goalManager.dailyCalories = dailyCalories;
+          _goalManager.dailyCarbs = dailyCarbs;
+          _goalManager.dailyProteins = dailyProteins;
+          _goalManager.dailyFats = dailyFats;
+        });
+      },
+      onError: () {},
+    );
   }
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -183,64 +183,70 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+      body: PageView(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IconButton(
-                  onPressed: () => _changeDate(-1),
-                  icon: const Icon(Icons.arrow_left),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: () => _changeDate(-1),
+                      icon: const Icon(Icons.arrow_left),
+                    ),
+                    Text(_formattedDate(),
+                        style: const TextStyle(fontSize: 20)),
+                    IconButton(
+                      onPressed: () => _changeDate(1),
+                      icon: const Icon(Icons.arrow_right),
+                    ),
+                    IconButton(
+                      onPressed: () => _selectDate(context),
+                      icon: const Icon(Icons.calendar_today),
+                    ),
+                  ],
                 ),
-                Text(_formattedDate(), style: const TextStyle(fontSize: 20)),
-                IconButton(
-                  onPressed: () => _changeDate(1),
-                  icon: const Icon(Icons.arrow_right),
+                const SizedBox(height: 20),
+                UIManager.buildProgressBar(
+                  label: "칼로리",
+                  currentValue: _dateManager.calories,
+                  goal: _goalManager.dailyCalories,
+                  onExcessTap: () => _handleExcessTap("칼로리"),
                 ),
-                IconButton(
-                  onPressed: () => _selectDate(context),
-                  icon: const Icon(Icons.calendar_today),
+                UIManager.buildProgressBar(
+                  label: "탄수화물",
+                  currentValue: _dateManager.carbs,
+                  goal: _goalManager.dailyCarbs,
+                  onExcessTap: () => _handleExcessTap("탄수화물"),
                 ),
+                UIManager.buildProgressBar(
+                  label: "단백질",
+                  currentValue: _dateManager.proteins,
+                  goal: _goalManager.dailyProteins,
+                  onExcessTap: () => _handleExcessTap("단백질"),
+                ),
+                UIManager.buildProgressBar(
+                  label: "지방",
+                  currentValue: _dateManager.fats,
+                  goal: _goalManager.dailyFats,
+                  onExcessTap: () => _handleExcessTap("지방"),
+                ),
+                const SizedBox(height: 20),
+                ...["아침", "점심", "저녁", "간식"].map((mealTime) {
+                  return UIManager.buildMealRow(
+                    meal: _nutritionManager.mealData[mealTime]!,
+                    mealTime: mealTime,
+                    onEdit: () => openFoodSelectionScreen(mealTime),
+                  );
+                }),
               ],
             ),
-            const SizedBox(height: 20),
-            UIManager.buildProgressBar(
-              label: "칼로리",
-              currentValue: _dateManager.calories,
-              goal: _goalManager.dailyCalories,
-              onExcessTap: () => _handleExcessTap("칼로리"),
-            ),
-            UIManager.buildProgressBar(
-              label: "탄수화물",
-              currentValue: _dateManager.carbs,
-              goal: _goalManager.dailyCarbs,
-              onExcessTap: () => _handleExcessTap("탄수화물"),
-            ),
-            UIManager.buildProgressBar(
-              label: "단백질",
-              currentValue: _dateManager.proteins,
-              goal: _goalManager.dailyProteins,
-              onExcessTap: () => _handleExcessTap("단백질"),
-            ),
-            UIManager.buildProgressBar(
-              label: "지방",
-              currentValue: _dateManager.fats,
-              goal: _goalManager.dailyFats,
-              onExcessTap: () => _handleExcessTap("지방"),
-            ),
-            const SizedBox(height: 20),
-            ...["아침", "점심", "저녁", "간식"].map((mealTime) {
-              return UIManager.buildMealRow(
-                meal: _nutritionManager.mealData[mealTime]!,
-                mealTime: mealTime,
-                onEdit: () => openFoodSelectionScreen(mealTime),
-              );
-            }),
-          ],
-        ),
+          ),
+          const WeightRecordScreen(), // PageView에 WeightRecordScreen 추가
+        ],
       ),
     );
   }
