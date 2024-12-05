@@ -7,17 +7,11 @@ class UserDataService {
 
   // 사용자 데이터 실시간 스트림
   Stream<Map<String, dynamic>> userDataStream(String userId) {
-    return firestore
+        return firestore
         .collection('users')
         .doc(userId)
         .snapshots()
-        .map((snapshot) {
-      if (snapshot.exists) {
-        return snapshot.data() as Map<String, dynamic>;
-      } else {
-        throw Exception("User data not found!");
-      }
-    });
+        .map((snapshot) => snapshot.data() ?? {});
   }
 
   // 사용자 데이터 단일 조회
