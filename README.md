@@ -91,7 +91,7 @@ Dietary의 주요 UI 화면은 다음과 같습니다:
 ---
 
 ## 1️⃣ 로그인 페이지
-![로그인 페이지](https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228.jpg)
+![로그인 페이지]<img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228.jpg" alt="로그인 페이지" width="500">
 
 ---
 
