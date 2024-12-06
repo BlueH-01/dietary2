@@ -82,7 +82,8 @@ class _CustomCalendarState extends State<CustomCalendar> {
     final proteins = data['proteins'] ?? 0.0;
     final fats = data['fats'] ?? 0.0;
 
-    return calories <= widget.goalManager.dailyCalories &&
+    return 
+        calories <= widget.goalManager.dailyCalories &&
         carbs <= widget.goalManager.dailyCarbs &&
         proteins <= widget.goalManager.dailyProteins &&
         fats <= widget.goalManager.dailyFats;
