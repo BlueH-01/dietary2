@@ -12,10 +12,6 @@ class CommunityScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('커뮤니티 게시판'),
-        backgroundColor: Colors.green,
-      ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _communityService.getPosts(),
         builder: (context, snapshot) {
