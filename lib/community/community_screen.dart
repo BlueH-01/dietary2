@@ -12,6 +12,10 @@ class CommunityScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('커뮤니티 게시판'),
+        backgroundColor: Colors.green,
+      ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _communityService.getPosts(),
         builder: (context, snapshot) {
@@ -32,10 +36,17 @@ class CommunityScreen extends StatelessWidget {
               final post = posts[index];
               return Card(
                 margin: const EdgeInsets.all(8.0),
-                elevation: 4,
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0), // 둥근 모서리
+                ),
                 child: ListTile(
+                  contentPadding: const EdgeInsets.all(16.0), // 내용 패딩 추가
                   title: Text(post['title'],
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18, // 글자 크기 조정
+                      )),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -46,20 +57,18 @@ class CommunityScreen extends StatelessWidget {
                         post['comment'],
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
+                        style:
+                            const TextStyle(color: Colors.grey), // 댓글 텍스트 스타일
                       ),
                     ],
                   ),
                   leading: post['image_url'].isNotEmpty
-                      ? Image.network(post['image_url'],
-                          width: 50, height: 50, fit: BoxFit.cover)
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Image.network(post['image_url'],
+                              width: 50, height: 50, fit: BoxFit.cover),
+                        )
                       : null,
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.grey),
-                    onPressed: () async {
-                      final postId = post['id']; // 게시글 ID를 받아서 삭제
-                      await _communityService.deletePost(postId);
-                    },
-                  ),
                   onTap: () {
                     final postId = post['id']; // 게시글 ID
                     Navigator.push(
@@ -89,7 +98,8 @@ class CommunityScreen extends StatelessWidget {
             MaterialPageRoute(builder: (context) => const AddPostScreen()),
           );
         },
-        child: const Icon(Icons.edit),
+        backgroundColor: Colors.green,
+        child: const Icon(Icons.add),
       ),
     );
   }
