@@ -80,22 +80,4 @@ class DateManager {
     selectedDate = selectedDate.add(Duration(days: days));
     onDateChanged(selectedDate);
   }
-
-  // 날짜 선택
-  Future<void> selectDate(
-    BuildContext context, {
-    required Function(DateTime) onDateSelected,
-  }) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-
-    if (picked != null && picked != selectedDate) {
-      selectedDate = picked;
-      onDateSelected(selectedDate);
-    }
-  }
 }
