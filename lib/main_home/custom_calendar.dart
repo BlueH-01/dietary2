@@ -53,22 +53,19 @@ class _CustomCalendarState extends State<CustomCalendar> {
   Future<void> _fetchRecommendedFoods() async {
     final firestore = widget.dateManager.firestore;
 
-    final currentMonth = _focusedDate.month; // 현재 달을 추출
+    final currentMonth = _focusedDate.month;
     final collection = firestore.collection('recommend_food');
 
-    // month 필드를 기준으로 필터링하여 해당 달의 추천 음식을 가져옵니다.
     final snapshot = await collection
-        .where('month',
-            isEqualTo: currentMonth) // 'month' 필드가 현재 달과 일치하는 문서만 가져오기
+        .where('month', isEqualTo: currentMonth)
         .get();
 
     final foods = snapshot.docs.map((doc) {
-      final data =
-          doc.data() as Map<String, dynamic>; // Cast to Map<String, dynamic>
+      final data = doc.data() as Map<String, dynamic>;
       return {
         'food_name': data['food_name'] as String,
         'image_url': data['image_url'] as String,
-        'comment': data['comment'] as String, // comment 추가
+        'comment': data['comment'] as String,
       };
     }).toList();
 
@@ -93,16 +90,60 @@ class _CustomCalendarState extends State<CustomCalendar> {
     setState(() {
       _focusedDate = DateTime(_focusedDate.year, _focusedDate.month + 1, 1);
     });
-    _fetchRecommendedFoods(); // 다음 달 음식 추천 로드
+    _fetchRecommendedFoods();
   }
 
   void _goToPreviousMonth() {
     setState(() {
       _focusedDate = DateTime(_focusedDate.year, _focusedDate.month - 1, 1);
     });
-    _fetchRecommendedFoods(); // 이전 달 음식 추천 로드
+    _fetchRecommendedFoods();
   }
 
+  /*void _selectYear() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _focusedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() {
+        _focusedDate = DateTime(picked.year, _focusedDate.month, 1);
+      });
+      _fetchRecommendedFoods();
+    }
+  }*/
+
+  void _selectMonth() async {
+    final selectedMonth = await showDialog<int>(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: const Text("Select Month"),
+          children: List.generate(12, (index) {
+            return SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context, index + 1);
+              },
+              child: Text("${index + 1}월"),
+            );
+          }),
+        );
+      },
+    );
+
+    if (selectedMonth != null) {
+      setState(() {
+        _focusedDate = DateTime(_focusedDate.year, selectedMonth, 1);
+      });
+      _fetchRecommendedFoods();
+    }
+  }
+
+  String _getMonthTitle(DateTime date) {
+    return '${date.year}년 ${date.month}월';
+  }
   List<DateTime> _generateDaysInMonth(DateTime month) {
     final firstDay = DateTime(month.year, month.month, 1);
     final lastDay = DateTime(month.year, month.month + 1, 0);
@@ -122,9 +163,6 @@ class _CustomCalendarState extends State<CustomCalendar> {
     ];
   }
 
-  String _getMonthTitle(DateTime date) {
-    return '${date.year}년 ${date.month}월';
-  }
 
   Widget build(BuildContext context) {
     final daysInMonth = _generateDaysInMonth(_focusedDate);
@@ -137,6 +175,10 @@ class _CustomCalendarState extends State<CustomCalendar> {
         ),
         backgroundColor: const Color.fromARGB(255, 132, 195, 135),
         actions: [
+          IconButton(
+            onPressed: _selectMonth,
+            icon: const Icon(Icons.calendar_view_month),
+          ),
           IconButton(
             onPressed: _goToPreviousMonth,
             icon: const Icon(Icons.arrow_left),
