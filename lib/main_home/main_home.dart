@@ -29,6 +29,7 @@ class _MainScreenState extends State<MainScreen> {
   late NutritionManager _nutritionManager;
   late GoalManager _goalManager;
   late UserDataService _userDataService;
+  late WeightRecordScreen _weightRecordScreen;
 
   StreamSubscription<Map<String, dynamic>>? _userDataSubcription;
 
@@ -50,7 +51,7 @@ class _MainScreenState extends State<MainScreen> {
     _nutritionManager = _dateManager.nutritionManager;
     _goalManager = GoalManager(firestore: _firestore, userId: userId);
     _userDataService = UserDataService(_firestore);
-
+    _weightRecordScreen = WeightRecordScreen(firestore: _firestore, userId: userId);
     _userDataService.userDataStream(userId).listen((userData) {
       _fetchDailyGoal(); // 목표값 업데이트
     });
@@ -219,7 +220,7 @@ class _MainScreenState extends State<MainScreen> {
         controller: _pageController,
         onPageChanged: _onPageChanged,
         children: [
-          const WeightRecordScreen(), // 몸무게 기록 화면 (왼쪽)
+          _weightRecordScreen, // 몸무게 기록 화면 (왼쪽)
           SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
