@@ -90,74 +90,38 @@ Dietary의 주요 UI 화면은 다음과 같습니다:
 
 ---
 
-## 1️⃣ 로그인 페이지 2️⃣ 회원가입 페이지 3️⃣ 회원 정보 입력 페이지
-<div style="display: flex; flex-wrap: wrap; justify-content: center;">
-    <div style="margin: 10px;">
-        <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228.jpg" alt="로그인 페이지" width="100">
-        
-    </div>
-    <div style="margin: 10px;">
-        <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_01.jpg" alt="회원가입 페이지" width="100">
-        
-    </div>
-    <div style="margin: 10px;">
-        <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_02.jpg" alt="회원정보 입력 페이지" width="100">
-        
-    </div>
+## 1️⃣ 로그인 페이지, 2️⃣ 회원가입 페이지, 3️⃣ 회원 정보 입력 페이지
+<div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+    <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228.jpg" alt="로그인 페이지" width="150">
+    <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_01.jpg" alt="회원가입 페이지" width="150">
+    <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_02.jpg" alt="회원정보 입력 페이지" width="150">
 </div>
 
 ---
 
-## 4️⃣ 영양 관리 페이지 5️⃣ 달력 (제철 음식 추천 페이지) 6️⃣ 음식 등록 및 즐겨찾기 목록
-<div style="display: flex; flex-wrap: wrap; justify-content: center;">
-    <div style="margin: 10px;">
-        <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_03.jpg" alt="영양 관리 페이지" width="100">
-        
-    </div>
-    <div style="margin: 10px;">
-        <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_04.jpg" alt="달력 페이지" width="100">
-       
-    </div>
-    <div style="margin: 10px;">
-        <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_05.jpg" alt="음식 등록 및 즐겨찾기" width="100">
-        
-    </div>
+## 4️⃣ 영양 관리 페이지, 5️⃣ 달력 (제철 음식 추천 페이지), 6️⃣ 음식 등록 및 즐겨찾기 목록
+<div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+    <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_03.jpg" alt="영양 관리 페이지" width="150">
+    <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_04.jpg" alt="달력 페이지" width="150">
+    <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_05.jpg" alt="음식 등록 및 즐겨찾기" width="150">
 </div>
 
 ---
 
-## 7️⃣ 음식 등록2 8️⃣ 내 정보 9️⃣ 식사 알림
-<div style="display: flex; flex-wrap: wrap; justify-content: center;">
-    <div style="margin: 10px;">
-        <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_06.jpg" alt="음식 등록2" width="100">
-        
-    </div>
-    <div style="margin: 10px;">
-        <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_07.jpg" alt="내 정보 수정" width="100">
-       
-    </div>
-    <div style="margin: 10px;">
-        <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_08.jpg" alt="식사 알림" width="100">
-        
-    </div>
+## 7️⃣ 음식 등록2, 8️⃣ 내 정보, 9️⃣ 식사 알림
+<div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+    <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_06.jpg" alt="음식 등록2" width="150">
+    <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_07.jpg" alt="내 정보 수정" width="150">
+    <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_08.jpg" alt="식사 알림" width="150">
 </div>
 
 ---
 
-## 🔟 커뮤니티 알림 1️⃣1️⃣ 게시글 작성 페이지 1️⃣2️⃣ 운동 추천
-<div style="display: flex; flex-wrap: wrap; justify-content: center;">
-    <div style="margin: 10px;">
-        <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_09.jpg" alt="커뮤니티 알림" width="100">
-        
-    </div>
-    <div style="margin: 10px;">
-        <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_10.jpg" alt="게시글 작성" width="100">
-        
-    </div>
-    <div style="margin: 10px;">
-        <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_11.jpg" alt="운동 추천" width="100">
-        
-    </div>
+## 🔟 커뮤니티 알림, 1️⃣1️⃣ 게시글 작성 페이지, 1️⃣2️⃣ 운동 추천
+<div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+    <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_09.jpg" alt="커뮤니티 알림" width="150">
+    <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_10.jpg" alt="게시글 작성" width="150">
+    <img src="https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_11.jpg" alt="운동 추천" width="150">
 </div>
 
 
