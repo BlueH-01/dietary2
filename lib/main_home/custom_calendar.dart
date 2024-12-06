@@ -27,6 +27,8 @@ class _CustomCalendarState extends State<CustomCalendar> {
     super.initState();
     _highlightGoalDates();
     _fetchRecommendedFoods();
+    _focusedDate = widget.dateManager.selectedDate; // 초기 포커스 설정
+    _selectedDate = widget.dateManager.selectedDate;
   }
 
   Future<void> _highlightGoalDates() async {
@@ -100,21 +102,6 @@ class _CustomCalendarState extends State<CustomCalendar> {
     _fetchRecommendedFoods();
   }
 
-  /*void _selectYear() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _focusedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      setState(() {
-        _focusedDate = DateTime(picked.year, _focusedDate.month, 1);
-      });
-      _fetchRecommendedFoods();
-    }
-  }*/
-
   void _selectMonth() async {
     final selectedMonth = await showDialog<int>(
       context: context,
@@ -144,6 +131,7 @@ class _CustomCalendarState extends State<CustomCalendar> {
   String _getMonthTitle(DateTime date) {
     return '${date.year}년 ${date.month}월';
   }
+
   List<DateTime> _generateDaysInMonth(DateTime month) {
     final firstDay = DateTime(month.year, month.month, 1);
     final lastDay = DateTime(month.year, month.month + 1, 0);
@@ -223,9 +211,10 @@ class _CustomCalendarState extends State<CustomCalendar> {
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      _selectedDate = date;
-                      widget.dateManager.selectedDate = date;
+                        _selectedDate = date;
+                        widget.dateManager.selectedDate = date;
                     });
+                    Navigator.pop(context);
                   },
                   child: Container(
                     decoration: BoxDecoration(
