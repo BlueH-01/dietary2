@@ -37,21 +37,21 @@ class GoalManager {
         if (weightDiff > 0) {
           // 체중 증가 목표
           dailyCalories = currentWeight * 24 * 1.7;
-          dailyProteins = (dailyCalories * 0.35) / 4;
+          dailyProteins = (dailyCalories * 0.21) / 4;
           dailyFats = (dailyCalories * 0.2) / 9;
           dailyCarbs =
               (dailyCalories - (dailyProteins * 4 + dailyFats * 9)) / 4;
         } else if (weightDiff < 0) {
           // 체중 감소 목표
           dailyCalories = currentWeight * 24 * 1.3;
-          dailyProteins = (dailyCalories * 0.4) / 4;
+          dailyProteins = (dailyCalories * 0.21) / 4;
           dailyFats = (dailyCalories * 0.2) / 9;
           dailyCarbs =
               (dailyCalories - (dailyProteins * 4 + dailyFats * 9)) / 4;
         } else {
           // 체중 유지 목표
           dailyCalories = currentWeight * 24 * 1.5;
-          dailyProteins = (dailyCalories * 0.25) / 4;
+          dailyProteins = (dailyCalories * 1.9) / 4;
           dailyFats = (dailyCalories * 0.3) / 9;
           dailyCarbs =
               (dailyCalories - (dailyProteins * 4 + dailyFats * 9)) / 4;
