@@ -20,21 +20,21 @@ class _CustomCalendarState extends State<CustomCalendar> {
   DateTime _focusedDate = DateTime.now();
   DateTime? _selectedDate;
   final Set<DateTime> _highlightedDates = {};
+  List<Map<String, String>> _recommendedFoods = [];
 
   @override
   void initState() {
     super.initState();
     _highlightGoalDates();
+    _fetchRecommendedFoods();
   }
 
   Future<void> _highlightGoalDates() async {
     final userId = widget.dateManager.userId;
     final firestore = widget.dateManager.firestore;
 
-    final collection = firestore
-        .collection('users')
-        .doc(userId)
-        .collection('daily_data');
+    final collection =
+        firestore.collection('users').doc(userId).collection('daily_data');
 
     final snapshot = await collection.get();
 
@@ -48,6 +48,33 @@ class _CustomCalendarState extends State<CustomCalendar> {
         });
       }
     }
+  }
+
+  Future<void> _fetchRecommendedFoods() async {
+    final firestore = widget.dateManager.firestore;
+
+    final currentMonth = _focusedDate.month; // 현재 달을 추출
+    final collection = firestore.collection('recommend_food');
+
+    // month 필드를 기준으로 필터링하여 해당 달의 추천 음식을 가져옵니다.
+    final snapshot = await collection
+        .where('month',
+            isEqualTo: currentMonth) // 'month' 필드가 현재 달과 일치하는 문서만 가져오기
+        .get();
+
+    final foods = snapshot.docs.map((doc) {
+      final data =
+          doc.data() as Map<String, dynamic>; // Cast to Map<String, dynamic>
+      return {
+        'food_name': data['food_name'] as String,
+        'image_url': data['image_url'] as String,
+        'comment': data['comment'] as String, // comment 추가
+      };
+    }).toList();
+
+    setState(() {
+      _recommendedFoods = foods;
+    });
   }
 
   bool _meetsGoals(Map<String, dynamic> data) {
@@ -66,12 +93,14 @@ class _CustomCalendarState extends State<CustomCalendar> {
     setState(() {
       _focusedDate = DateTime(_focusedDate.year, _focusedDate.month + 1, 1);
     });
+    _fetchRecommendedFoods(); // 다음 달 음식 추천 로드
   }
 
   void _goToPreviousMonth() {
     setState(() {
       _focusedDate = DateTime(_focusedDate.year, _focusedDate.month - 1, 1);
     });
+    _fetchRecommendedFoods(); // 이전 달 음식 추천 로드
   }
 
   List<DateTime> _generateDaysInMonth(DateTime month) {
@@ -83,7 +112,6 @@ class _CustomCalendarState extends State<CustomCalendar> {
       (index) => DateTime(month.year, month.month, index + 1),
     );
 
-    // 앞뒤로 빈 날짜 채우기 (달력 정렬을 위해)
     final leadingEmptyDays = firstDay.weekday - 1;
     final trailingEmptyDays = 7 - lastDay.weekday;
 
@@ -95,10 +123,9 @@ class _CustomCalendarState extends State<CustomCalendar> {
   }
 
   String _getMonthTitle(DateTime date) {
-    return '${date.year}년 ${date.month}월'; // 2023 - 12 형식 표시
+    return '${date.year}년 ${date.month}월';
   }
 
-  @override
   Widget build(BuildContext context) {
     final daysInMonth = _generateDaysInMonth(_focusedDate);
 
@@ -120,67 +147,122 @@ class _CustomCalendarState extends State<CustomCalendar> {
           ),
         ],
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(16.0),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 7,
-          crossAxisSpacing: 4.0,
-          mainAxisSpacing: 4.0,
-        ),
-        itemCount: daysInMonth.length,
-        itemBuilder: (context, index) {
-          final date = daysInMonth[index];
-
-          if (date.year == 0) {
-            // 빈 칸 (빈 날짜)
-            return const SizedBox.shrink();
-          }
-
-          final isToday = date.day == DateTime.now().day &&
-              date.month == DateTime.now().month &&
-              date.year == DateTime.now().year;
-
-          final isSelected = _selectedDate != null &&
-              date.day == _selectedDate!.day &&
-              date.month == _selectedDate!.month &&
-              date.year == _selectedDate!.year;
-
-          final isHighlighted = _highlightedDates.contains(date);
-
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedDate = date;
-                widget.dateManager.selectedDate = date;
-              });
-              Navigator.pop(context); // 날짜 선택 후 화면 닫기
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color
-                  :isHighlighted
-                      ? Colors.green
-                      : isSelected
-                          ? Colors.orange
-                          : isToday
-                              ? Colors.blue
-                              : Colors.white,
-                borderRadius: BorderRadius.circular(8.0),
-                border: Border.all(color: Colors.grey.shade300),
+      body: Column(
+        children: [
+          // 달력 공간 줄이기
+          Expanded(
+            flex: 1, // 이전 flex: 2에서 1로 변경
+            child: GridView.builder(
+              padding: const EdgeInsets.all(8.0),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 7,
+                crossAxisSpacing: 4.0,
+                mainAxisSpacing: 4.0,
               ),
-              alignment: Alignment.center,
-              child: Text(
-                '${date.day}',
-                style: TextStyle(
-                  color: date.month == _focusedDate.month
-                      ? Colors.black
-                      : Colors.grey,
-                  fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
+              itemCount: daysInMonth.length,
+              itemBuilder: (context, index) {
+                final date = daysInMonth[index];
+
+                if (date.year == 0) {
+                  return const SizedBox.shrink();
+                }
+
+                final isToday = date.day == DateTime.now().day &&
+                    date.month == DateTime.now().month &&
+                    date.year == DateTime.now().year;
+
+                final isSelected = _selectedDate != null &&
+                    date.day == _selectedDate!.day &&
+                    date.month == _selectedDate!.month &&
+                    date.year == _selectedDate!.year;
+
+                final isHighlighted = _highlightedDates.contains(date);
+
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedDate = date;
+                      widget.dateManager.selectedDate = date;
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: isHighlighted
+                          ? Colors.green
+                          : isSelected
+                              ? Colors.orange
+                              : isToday
+                                  ? Colors.blue
+                                  : Colors.white,
+                      borderRadius: BorderRadius.circular(8.0),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      '${date.day}',
+                      style: TextStyle(
+                        color: date.month == _focusedDate.month
+                            ? Colors.black
+                            : Colors.grey,
+                        fontWeight:
+                            isToday ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-          );
-        },
+          ),
+          // 추천 음식 리스트 공간은 그대로 유지
+          Expanded(
+            flex: 1,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _recommendedFoods.length,
+              itemBuilder: (context, index) {
+                final food = _recommendedFoods[index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.network(
+                        food['image_url']!,
+                        width: 150,
+                        height: 150,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.broken_image),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        food['food_name']!,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        width: 150, // 이미지의 너비와 동일한 너비를 지정하거나 적당한 크기 설정
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: Text(
+                          food['comment']!,
+                          style: TextStyle(color: Colors.grey),
+                          textAlign: TextAlign.center,
+                          softWrap: true, // 텍스트 줄바꿈 허용
+                          overflow: TextOverflow.fade, // 텍스트가 너무 길면 페이드 처리
+                          maxLines: 6,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
