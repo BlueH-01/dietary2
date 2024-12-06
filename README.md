@@ -83,6 +83,29 @@
 
 ---
 
+
+# Dietary UI 소개 ✨  
+
+Dietary의 주요 UI 화면은 다음과 같습니다:
+
+---
+
+## 1️⃣ 로그인 페이지
+![로그인 페이지](https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228.jpg)
+
+---
+
+## 2️⃣ 회원가입 페이지
+![회원가입 페이지](https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_01.jpg)
+
+---
+## 3️⃣ 회원 정보 입력 페이지
+![회원 정보 입력 페이지](https://raw.githubusercontent.com/BlueH-01/dietary2/main/screenshots/KakaoTalk_20241206_140222228_02.jpg)
+
+
+
+
+
 ## 📥 설치 및 실행  
 
 ### 설치 방법  
